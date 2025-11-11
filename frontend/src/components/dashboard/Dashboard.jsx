@@ -137,7 +137,10 @@ const Dashboard = () => {
             >
               Manage Chairs
             </button>
-            <button className="btn-secondary">
+            <button
+              onClick={() => navigate('/departments')}
+              className="btn-secondary"
+            >
               Manage Departments
             </button>
           </div>

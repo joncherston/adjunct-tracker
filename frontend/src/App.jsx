@@ -6,6 +6,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import Dashboard from './components/dashboard/Dashboard';
 import CampusManagement from './components/admin/CampusManagement';
 import DepartmentChairManagement from './components/admin/DepartmentChairManagement';
+import DepartmentManagement from './components/admin/DepartmentManagement';
 
 function App() {
   return (
@@ -69,6 +70,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <DepartmentChairManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Department Management Route */}
+          <Route
+            path="/departments"
+            element={
+              <ProtectedRoute>
+                <DepartmentManagement />
               </ProtectedRoute>
             }
           />
