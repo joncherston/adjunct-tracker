@@ -1,10 +1,14 @@
-import { BrowserRouter as Router } from 'react-router-dom'
-import { Toaster } from 'react-hot-toast'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './contexts/AuthContext';
+import LoginPage from './components/auth/LoginPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import Dashboard from './components/dashboard/Dashboard';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
+      <AuthProvider>
         {/* Toast notifications */}
         <Toaster
           position="top-right"
@@ -29,23 +33,30 @@ function App() {
           }}
         />
 
-        {/* Main Content */}
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-suscc-blue mb-4">
-              SUSCC Adjunct Instructor Tracker
-            </h1>
-            <p className="text-lg text-gray-600">
-              System initializing... Please wait while we set up your environment.
-            </p>
-            <div className="mt-8">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-suscc-blue"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+        {/* Routes */}
+        <Routes>
+          {/* Redirect root to dashboard */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+          {/* Login Route */}
+          <Route path="/login" element={<LoginPage />} />
+
+          {/* Protected Dashboard Route */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Catch all - redirect to dashboard */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </AuthProvider>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
