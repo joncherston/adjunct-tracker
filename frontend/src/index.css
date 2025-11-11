@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SUSCC Brand Styles */
+@layer base {
+  body {
+    @apply font-sans text-gray-900 bg-gray-50;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans font-bold text-suscc-blue;
+  }
+}
+
+@layer components {
+  /* Primary Button (SUSCC Blue) */
+  .btn-primary {
+    @apply bg-suscc-blue text-white px-6 py-2.5 rounded-md font-semibold
+           hover:bg-suscc-blue-dark transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-suscc-blue focus:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Secondary Button (SUSCC Gold) */
+  .btn-secondary {
+    @apply bg-suscc-gold text-suscc-blue-dark px-6 py-2.5 rounded-md font-semibold
+           hover:bg-suscc-gold-dark transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-suscc-gold focus:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Danger Button */
+  .btn-danger {
+    @apply bg-danger text-white px-6 py-2.5 rounded-md font-semibold
+           hover:bg-red-700 transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Card Component */
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+
+  /* Input Field */
+  .input {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-md
+           focus:outline-none focus:ring-2 focus:ring-suscc-blue focus:border-transparent
+           disabled:bg-gray-100 disabled:cursor-not-allowed;
+  }
+
+  /* Input Error State */
+  .input-error {
+    @apply border-danger focus:ring-danger;
+  }
+
+  /* Label */
+  .label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+
+  /* Error Message */
+  .error-message {
+    @apply text-danger text-sm mt-1;
+  }
+}
