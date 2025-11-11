@@ -7,7 +7,8 @@ from app.database import init_db
 
 # Import routers
 from app.routers import auth
-# from app.routers.admin import campuses, chairs, departments, semesters, reports
+from app.routers.admin import campuses
+# from app.routers.admin import chairs, departments, semesters, reports
 # from app.routers import submit
 
 # Create FastAPI app
@@ -55,7 +56,7 @@ async def health_check():
 
 # Include routers
 app.include_router(auth.router, prefix=f"{settings.API_PREFIX}/auth", tags=["Authentication"])
-# app.include_router(campuses.router, prefix=f"{settings.API_PREFIX}/admin/campuses", tags=["Admin - Campuses"])
+app.include_router(campuses.router, prefix=f"{settings.API_PREFIX}/admin/campuses", tags=["Admin - Campuses"])
 # app.include_router(chairs.router, prefix=f"{settings.API_PREFIX}/admin/chairs", tags=["Admin - Department Chairs"])
 # app.include_router(departments.router, prefix=f"{settings.API_PREFIX}/admin/departments", tags=["Admin - Departments"])
 # app.include_router(semesters.router, prefix=f"{settings.API_PREFIX}/admin/semesters", tags=["Admin - Semesters"])

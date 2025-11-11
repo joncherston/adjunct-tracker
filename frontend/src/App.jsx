@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import LoginPage from './components/auth/LoginPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Dashboard from './components/dashboard/Dashboard';
+import CampusManagement from './components/admin/CampusManagement';
 
 function App() {
   return (
@@ -47,6 +48,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Campus Management Route */}
+          <Route
+            path="/campuses"
+            element={
+              <ProtectedRoute>
+                <CampusManagement />
               </ProtectedRoute>
             }
           />

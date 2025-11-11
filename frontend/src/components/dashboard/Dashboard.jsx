@@ -125,7 +125,10 @@ const Dashboard = () => {
             <button className="btn-primary">
               Create Semester Request
             </button>
-            <button className="btn-secondary">
+            <button
+              onClick={() => navigate('/campuses')}
+              className="btn-secondary"
+            >
               Manage Campuses
             </button>
             <button className="btn-secondary">
