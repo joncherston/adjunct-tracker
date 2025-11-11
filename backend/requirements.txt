@@ -12,8 +12,8 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-dotenv==1.0.0
 
-# Email
-sendgrid==6.11.0
+# Email (Brevo - formerly Sendinblue)
+sib-api-v3-sdk==7.6.0
 
 # Validation
 pydantic==2.5.0

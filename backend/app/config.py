@@ -23,11 +23,11 @@ class Settings(BaseSettings):
     JWT_EXPIRATION_MINUTES: int = 60
     JWT_REFRESH_EXPIRATION_DAYS: int = 7
 
-    # Email (SendGrid)
-    SENDGRID_API_KEY: str = ""
-    FROM_EMAIL: str = "noreply@suscc.edu"
+    # Email (Brevo)
+    BREVO_API_KEY: str = ""
+    FROM_EMAIL: str = "noreply@suscholarsbowl.com"
     FROM_NAME: str = "SUSCC Adjunct Committee"
-    ADMIN_EMAIL: str = "adjunct-chair@suscc.edu"
+    ADMIN_EMAIL: str = "adjunct-chair@suscholarsbowl.com"
 
     # CORS
     FRONTEND_URL: str = "http://localhost:5173"
