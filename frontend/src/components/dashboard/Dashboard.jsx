@@ -121,9 +121,18 @@ const Dashboard = () => {
           <h2 className="text-xl font-bold text-suscc-blue mb-4">
             Quick Actions
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button className="btn-primary">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <button
+              onClick={() => navigate('/semesters/create')}
+              className="btn-primary"
+            >
               Create Semester Request
+            </button>
+            <button
+              onClick={() => navigate('/semesters')}
+              className="btn-secondary"
+            >
+              Track Semesters
             </button>
             <button
               onClick={() => navigate('/campuses')}

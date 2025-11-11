@@ -75,4 +75,14 @@ export const departmentsAPI = {
   delete: (id) => api.delete(`/admin/departments/${id}`),
 };
 
+// Semesters API
+export const semestersAPI = {
+  getAll: (includeRequests = false) => api.get('/admin/semesters', { params: { include_requests: includeRequests } }),
+  getById: (id) => api.get(`/admin/semesters/${id}`),
+  create: (data) => api.post('/admin/semesters', data),
+  update: (id, data) => api.put(`/admin/semesters/${id}`, data),
+  delete: (id) => api.delete(`/admin/semesters/${id}`),
+  sendReminders: (id, requestIds) => api.post(`/admin/semesters/${id}/send-reminders`, { request_ids: requestIds }),
+};
+
 export default api;

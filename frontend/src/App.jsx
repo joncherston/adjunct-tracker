@@ -7,6 +7,8 @@ import Dashboard from './components/dashboard/Dashboard';
 import CampusManagement from './components/admin/CampusManagement';
 import DepartmentChairManagement from './components/admin/DepartmentChairManagement';
 import DepartmentManagement from './components/admin/DepartmentManagement';
+import SemesterTracking from './components/admin/SemesterTracking';
+import CreateSemesterRequest from './components/admin/CreateSemesterRequest';
 
 function App() {
   return (
@@ -80,6 +82,26 @@ function App() {
             element={
               <ProtectedRoute>
                 <DepartmentManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Semester Tracking Route */}
+          <Route
+            path="/semesters"
+            element={
+              <ProtectedRoute>
+                <SemesterTracking />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Create Semester Request Route */}
+          <Route
+            path="/semesters/create"
+            element={
+              <ProtectedRoute>
+                <CreateSemesterRequest />
               </ProtectedRoute>
             }
           />
