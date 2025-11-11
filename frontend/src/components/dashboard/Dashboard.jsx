@@ -131,11 +131,14 @@ const Dashboard = () => {
             >
               Manage Campuses
             </button>
-            <button className="btn-secondary">
-              Manage Departments
+            <button
+              onClick={() => navigate('/chairs')}
+              className="btn-secondary"
+            >
+              Manage Chairs
             </button>
             <button className="btn-secondary">
-              View Reports
+              Manage Departments
             </button>
           </div>
         </div>
