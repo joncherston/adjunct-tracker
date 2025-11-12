@@ -91,6 +91,8 @@ export const submitAPI = {
   addAdjunct: (token, data) => api.post(`/submit/${token}/adjuncts`, data),
   removeAdjunct: (token, assignmentId) => api.delete(`/submit/${token}/adjuncts/${assignmentId}`),
   submitRequest: (token) => api.post(`/submit/${token}/submit`),
+  getPreviousSemesters: (token) => api.get(`/submit/${token}/previous-semesters`),
+  copyFromPrevious: (token, semesterId) => api.post(`/submit/${token}/copy-from/${semesterId}`),
 };
 
 // Reports API

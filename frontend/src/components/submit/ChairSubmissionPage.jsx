@@ -4,7 +4,7 @@
  */
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, GraduationCap, Users, Plus, Trash2, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { Calendar, GraduationCap, Users, Plus, Trash2, Send, CheckCircle, AlertCircle, Copy, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { submitAPI } from '../../services/api';
 
@@ -16,6 +16,10 @@ const ChairSubmissionPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({ full_name: '', email: '' });
+  const [showCopyModal, setShowCopyModal] = useState(false);
+  const [previousSemesters, setPreviousSemesters] = useState([]);
+  const [loadingPrevious, setLoadingPrevious] = useState(false);
+  const [copying, setCopying] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -86,6 +90,47 @@ const ChairSubmissionPage = () => {
       toast.error(message);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleShowCopyModal = async () => {
+    setShowCopyModal(true);
+    setLoadingPrevious(true);
+
+    try {
+      const response = await submitAPI.getPreviousSemesters(token);
+      setPreviousSemesters(response.data);
+    } catch (error) {
+      console.error('Error loading previous semesters:', error);
+      toast.error('Failed to load previous semesters');
+      setShowCopyModal(false);
+    } finally {
+      setLoadingPrevious(false);
+    }
+  };
+
+  const handleCopyFromSemester = async (semesterId, semesterName) => {
+    if (!confirm(`Copy all adjuncts from ${semesterName}?`)) {
+      return;
+    }
+
+    try {
+      setCopying(true);
+      const response = await submitAPI.copyFromPrevious(token, semesterId);
+      toast.success(response.data.message);
+
+      if (response.data.skipped_count > 0) {
+        toast.info(`${response.data.skipped_count} adjunct(s) already added, skipped duplicates`);
+      }
+
+      setShowCopyModal(false);
+      loadRequestData(); // Refresh to show copied adjuncts
+    } catch (error) {
+      console.error('Error copying from semester:', error);
+      const message = error.response?.data?.detail || 'Failed to copy adjuncts';
+      toast.error(message);
+    } finally {
+      setCopying(false);
     }
   };
 
@@ -196,13 +241,23 @@ const ChairSubmissionPage = () => {
               </h2>
             </div>
             {!is_submitted && (
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="btn-primary flex items-center space-x-2"
-              >
-                <Plus className="h-5 w-5" />
-                <span>Add Adjunct</span>
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleShowCopyModal}
+                  className="btn-secondary flex items-center space-x-2"
+                >
+                  <Copy className="h-5 w-5" />
+                  <span className="hidden sm:inline">Copy from Previous</span>
+                  <span className="sm:hidden">Copy</span>
+                </button>
+                <button
+                  onClick={() => setShowAddForm(true)}
+                  className="btn-primary flex items-center space-x-2"
+                >
+                  <Plus className="h-5 w-5" />
+                  <span>Add Adjunct</span>
+                </button>
+              </div>
             )}
           </div>
 
@@ -325,6 +380,79 @@ const ChairSubmissionPage = () => {
           </div>
         )}
       </div>
+
+      {/* Copy from Previous Semester Modal */}
+      {showCopyModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-suscc-blue text-white px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Copy className="h-6 w-6" />
+                <h2 className="text-xl font-bold">Copy from Previous Semester</h2>
+              </div>
+              <button
+                onClick={() => setShowCopyModal(false)}
+                className="text-white hover:text-suscc-gold transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
+              {loadingPrevious ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-suscc-blue"></div>
+                  <p className="mt-4 text-gray-600">Loading previous semesters...</p>
+                </div>
+              ) : previousSemesters.length > 0 ? (
+                <>
+                  <p className="text-gray-600 mb-4">
+                    Select a previous semester to copy all adjunct instructors from that submission.
+                    Duplicates will be automatically skipped.
+                  </p>
+                  <div className="space-y-3">
+                    {previousSemesters.map((semester) => (
+                      <div
+                        key={semester.semester_id}
+                        className="p-4 border-2 border-gray-200 rounded-lg hover:border-suscc-blue transition-colors"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-900 text-lg">
+                              {semester.semester_display_name}
+                            </h3>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {semester.adjunct_count} adjunct{semester.adjunct_count !== 1 ? 's' : ''} •{' '}
+                              Submitted {new Date(semester.submitted_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleCopyFromSemester(semester.semester_id, semester.semester_display_name)}
+                            disabled={copying}
+                            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {copying ? 'Copying...' : 'Copy'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">No previous semester submissions found for your department.</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    You'll need to manually add adjuncts for this semester.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

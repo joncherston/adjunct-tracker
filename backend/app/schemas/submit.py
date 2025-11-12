@@ -90,3 +90,18 @@ class SemesterRequestDetailResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+
+class PreviousSemesterInfo(BaseModel):
+    """Info about a previous semester for copy functionality"""
+    semester_id: int
+    semester_display_name: str
+    adjunct_count: int
+    submitted_at: datetime
+
+
+class CopyFromPreviousResponse(BaseModel):
+    """Response after copying from previous semester"""
+    message: str
+    copied_count: int
+    skipped_count: int

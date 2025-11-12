@@ -5,6 +5,7 @@ Public endpoints for department chairs to submit adjunct data using access token
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import and_
 
 from app.database import get_db
 from app.models.semester import Semester, SemesterRequest
@@ -13,7 +14,9 @@ from app.models.adjunct import AdjunctInstructor, SemesterAdjunctAssignment
 from app.schemas.submit import (
     SemesterRequestDetailResponse,
     SubmitAdjunctData,
-    AdjunctSubmissionResponse
+    AdjunctSubmissionResponse,
+    PreviousSemesterInfo,
+    CopyFromPreviousResponse
 )
 
 router = APIRouter()
@@ -139,6 +142,138 @@ async def remove_adjunct(
     db.commit()
 
     return None
+
+
+@router.get("/{access_token}/previous-semesters", response_model=List[PreviousSemesterInfo])
+async def get_previous_semesters(
+    access_token: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Get list of previous semesters where this department submitted adjunct data
+
+    Used for the "Copy from Previous Semester" feature
+    """
+    # Verify access token and get current request
+    current_request = db.query(SemesterRequest).options(
+        joinedload(SemesterRequest.semester)
+    ).filter(SemesterRequest.access_token == access_token).first()
+
+    if not current_request:
+        raise HTTPException(status_code=404, detail="Invalid access token")
+
+    if current_request.is_submitted:
+        raise HTTPException(status_code=400, detail="This request has already been submitted")
+
+    # Find all previous submitted requests for this department
+    # Exclude current semester
+    previous_requests = db.query(SemesterRequest).options(
+        joinedload(SemesterRequest.semester)
+    ).filter(
+        and_(
+            SemesterRequest.department_id == current_request.department_id,
+            SemesterRequest.is_submitted == True,
+            SemesterRequest.semester_id != current_request.semester_id
+        )
+    ).order_by(SemesterRequest.semester_id.desc()).all()
+
+    # Build response with adjunct counts
+    result = []
+    for req in previous_requests:
+        adjunct_count = db.query(SemesterAdjunctAssignment).filter(
+            SemesterAdjunctAssignment.semester_request_id == req.id
+        ).count()
+
+        result.append({
+            "semester_id": req.semester_id,
+            "semester_display_name": req.semester.display_name,
+            "adjunct_count": adjunct_count,
+            "submitted_at": req.submitted_at
+        })
+
+    return result
+
+
+@router.post("/{access_token}/copy-from/{semester_id}", response_model=CopyFromPreviousResponse)
+async def copy_from_previous_semester(
+    access_token: str,
+    semester_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Copy all adjunct instructors from a previous semester
+
+    This creates new assignments for the current semester based on a previous submission
+    """
+    # Verify access token and get current request
+    current_request = db.query(SemesterRequest).filter(
+        SemesterRequest.access_token == access_token
+    ).first()
+
+    if not current_request:
+        raise HTTPException(status_code=404, detail="Invalid access token")
+
+    if current_request.is_submitted:
+        raise HTTPException(status_code=400, detail="This request has already been submitted and cannot be modified")
+
+    # Find the previous semester request
+    previous_request = db.query(SemesterRequest).filter(
+        and_(
+            SemesterRequest.semester_id == semester_id,
+            SemesterRequest.department_id == current_request.department_id,
+            SemesterRequest.is_submitted == True
+        )
+    ).first()
+
+    if not previous_request:
+        raise HTTPException(
+            status_code=404,
+            detail="Previous semester submission not found for this department"
+        )
+
+    # Get all assignments from previous semester
+    previous_assignments = db.query(SemesterAdjunctAssignment).filter(
+        SemesterAdjunctAssignment.semester_request_id == previous_request.id
+    ).all()
+
+    if not previous_assignments:
+        raise HTTPException(
+            status_code=400,
+            detail="No adjuncts found in the previous semester"
+        )
+
+    # Copy assignments to current semester
+    copied_count = 0
+    skipped_count = 0
+
+    for prev_assignment in previous_assignments:
+        # Check if this adjunct is already assigned in current semester
+        existing = db.query(SemesterAdjunctAssignment).filter(
+            and_(
+                SemesterAdjunctAssignment.semester_request_id == current_request.id,
+                SemesterAdjunctAssignment.adjunct_instructor_id == prev_assignment.adjunct_instructor_id
+            )
+        ).first()
+
+        if not existing:
+            # Create new assignment
+            new_assignment = SemesterAdjunctAssignment(
+                semester_request_id=current_request.id,
+                adjunct_instructor_id=prev_assignment.adjunct_instructor_id,
+                department_id=current_request.department_id
+            )
+            db.add(new_assignment)
+            copied_count += 1
+        else:
+            skipped_count += 1
+
+    db.commit()
+
+    return {
+        "message": f"Successfully copied {copied_count} adjunct(s) from previous semester",
+        "copied_count": copied_count,
+        "skipped_count": skipped_count
+    }
 
 
 @router.post("/{access_token}/submit", status_code=200)
