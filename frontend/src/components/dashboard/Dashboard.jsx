@@ -26,21 +26,24 @@ const Dashboard = () => {
                 <div className="bg-white rounded-full w-10 h-10 flex items-center justify-center">
                   <span className="text-suscc-blue font-bold text-xl">SU</span>
                 </div>
-                <span className="ml-3 text-white font-bold text-xl">
+                <span className="ml-3 text-white font-bold text-lg sm:text-xl hidden xs:inline">
                   Adjunct Tracker
+                </span>
+                <span className="ml-2 text-white font-bold text-base xs:hidden">
+                  AT
                 </span>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-white">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <span className="text-white text-sm sm:text-base hidden md:inline">
                 {user?.full_name}
               </span>
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-2 bg-white text-suscc-blue px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                className="flex items-center space-x-1 sm:space-x-2 bg-white text-suscc-blue px-3 sm:px-4 py-2 rounded-md hover:bg-gray-100 transition-colors text-sm sm:text-base"
               >
                 <LogOut className="h-4 w-4" />
-                <span>Logout</span>
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </div>
           </div>
@@ -51,10 +54,10 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-suscc-blue">
+          <h1 className="text-2xl sm:text-3xl font-bold text-suscc-blue">
             Welcome, {user?.full_name}!
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-sm sm:text-base text-gray-600 mt-2">
             Manage adjunct instructor data for Southern Union State Community College
           </p>
         </div>
