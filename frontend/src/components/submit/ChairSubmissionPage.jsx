@@ -7,6 +7,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, GraduationCap, Users, Plus, Trash2, Send, CheckCircle, AlertCircle, Copy, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { submitAPI } from '../../services/api';
+import { useEscapeKey } from '../../hooks/useKeyPress';
 
 const ChairSubmissionPage = () => {
   const { token } = useParams();
@@ -20,6 +21,9 @@ const ChairSubmissionPage = () => {
   const [previousSemesters, setPreviousSemesters] = useState([]);
   const [loadingPrevious, setLoadingPrevious] = useState(false);
   const [copying, setCopying] = useState(false);
+
+  // Close modal with Escape key for accessibility
+  useEscapeKey(() => setShowCopyModal(false), showCopyModal);
 
   useEffect(() => {
     if (token) {
@@ -383,19 +387,25 @@ const ChairSubmissionPage = () => {
 
       {/* Copy from Previous Semester Modal */}
       {showCopyModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="copy-modal-title"
+        >
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
             {/* Modal Header */}
             <div className="bg-suscc-blue text-white px-6 py-4 flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Copy className="h-6 w-6" />
-                <h2 className="text-xl font-bold">Copy from Previous Semester</h2>
+                <Copy className="h-6 w-6" aria-hidden="true" />
+                <h2 id="copy-modal-title" className="text-xl font-bold">Copy from Previous Semester</h2>
               </div>
               <button
                 onClick={() => setShowCopyModal(false)}
                 className="text-white hover:text-suscc-gold transition-colors"
+                aria-label="Close copy from previous semester dialog"
               >
-                <X className="h-6 w-6" />
+                <X className="h-6 w-6" aria-hidden="true" />
               </button>
             </div>
 

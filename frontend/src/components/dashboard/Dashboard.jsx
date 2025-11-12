@@ -17,8 +17,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Skip to main content for accessibility */}
+      <a href="#main-content" className="skip-to-main">
+        Skip to main content
+      </a>
+
       {/* Navigation Bar */}
-      <nav className="bg-suscc-blue shadow-lg">
+      <nav className="bg-suscc-blue shadow-lg" role="navigation" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -41,8 +46,9 @@ const Dashboard = () => {
               <button
                 onClick={handleLogout}
                 className="flex items-center space-x-1 sm:space-x-2 bg-white text-suscc-blue px-3 sm:px-4 py-2 rounded-md hover:bg-gray-100 transition-colors text-sm sm:text-base"
+                aria-label="Logout from admin panel"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-4 w-4" aria-hidden="true" />
                 <span className="hidden sm:inline">Logout</span>
               </button>
             </div>
@@ -51,7 +57,7 @@ const Dashboard = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-suscc-blue">
@@ -184,7 +190,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

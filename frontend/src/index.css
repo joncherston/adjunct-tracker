@@ -11,6 +11,24 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-sans font-bold text-suscc-blue;
   }
+
+  /* Skip to main content link for accessibility */
+  .skip-to-main {
+    @apply absolute top-0 left-0 bg-suscc-blue text-white px-4 py-2 z-50 -translate-y-full focus:translate-y-0 transition-transform;
+  }
+}
+
+/* Focus Visible Styles for Better Keyboard Navigation */
+@layer utilities {
+  /* Enhanced focus states for better visibility */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-suscc-blue;
+  }
+
+  /* Remove default focus for mouse users */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
 }
 
 @layer components {
