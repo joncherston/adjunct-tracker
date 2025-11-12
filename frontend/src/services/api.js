@@ -85,4 +85,12 @@ export const semestersAPI = {
   sendReminders: (id, requestIds) => api.post(`/admin/semesters/${id}/send-reminders`, { request_ids: requestIds }),
 };
 
+// Department Chair Submission API (public - no auth required, uses token)
+export const submitAPI = {
+  getRequestByToken: (token) => api.get(`/submit/${token}`),
+  addAdjunct: (token, data) => api.post(`/submit/${token}/adjuncts`, data),
+  removeAdjunct: (token, assignmentId) => api.delete(`/submit/${token}/adjuncts/${assignmentId}`),
+  submitRequest: (token) => api.post(`/submit/${token}/submit`),
+};
+
 export default api;

@@ -9,6 +9,7 @@ import DepartmentChairManagement from './components/admin/DepartmentChairManagem
 import DepartmentManagement from './components/admin/DepartmentManagement';
 import SemesterTracking from './components/admin/SemesterTracking';
 import CreateSemesterRequest from './components/admin/CreateSemesterRequest';
+import ChairSubmissionPage from './components/submit/ChairSubmissionPage';
 
 function App() {
   return (
@@ -105,6 +106,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Public Department Chair Submission Route (token-based access) */}
+          <Route path="/submit/:token" element={<ChairSubmissionPage />} />
 
           {/* Catch all - redirect to dashboard */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
