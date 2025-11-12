@@ -65,3 +65,62 @@
     @apply text-danger text-sm mt-1;
   }
 }
+
+/* Print Styles */
+@media print {
+  /* Hide non-printable elements */
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Remove shadows and backgrounds for cleaner print */
+  .print\\:shadow-none {
+    box-shadow: none !important;
+  }
+
+  /* Adjust page margins */
+  @page {
+    margin: 0.5in;
+  }
+
+  /* Reset background colors */
+  body {
+    background: white !important;
+  }
+
+  /* Ensure proper page breaks */
+  .card {
+    page-break-inside: avoid;
+  }
+
+  /* Table styling for print */
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  /* Remove hover effects */
+  *:hover {
+    background: inherit !important;
+  }
+
+  /* Ensure text is black for readability */
+  h1, h2, h3, h4, h5, h6, p, td, th {
+    color: black !important;
+  }
+
+  /* Remove borders from cards for cleaner look */
+  .card {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+}

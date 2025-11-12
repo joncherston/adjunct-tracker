@@ -93,4 +93,9 @@ export const submitAPI = {
   submitRequest: (token) => api.post(`/submit/${token}/submit`),
 };
 
+// Reports API
+export const reportsAPI = {
+  getSemesterReport: (semesterId) => api.get(`/admin/reports/semester/${semesterId}`),
+};
+
 export default api;

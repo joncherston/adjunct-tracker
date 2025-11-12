@@ -10,6 +10,7 @@ import DepartmentManagement from './components/admin/DepartmentManagement';
 import SemesterTracking from './components/admin/SemesterTracking';
 import CreateSemesterRequest from './components/admin/CreateSemesterRequest';
 import ChairSubmissionPage from './components/submit/ChairSubmissionPage';
+import Reports from './components/admin/Reports';
 
 function App() {
   return (
@@ -103,6 +104,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <CreateSemesterRequest />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Reports Route */}
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <Reports />
               </ProtectedRoute>
             }
           />

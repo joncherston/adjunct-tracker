@@ -121,7 +121,7 @@ const Dashboard = () => {
           <h2 className="text-xl font-bold text-suscc-blue mb-4">
             Quick Actions
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <button
               onClick={() => navigate('/semesters/create')}
               className="btn-primary"
@@ -133,6 +133,12 @@ const Dashboard = () => {
               className="btn-secondary"
             >
               Track Semesters
+            </button>
+            <button
+              onClick={() => navigate('/reports')}
+              className="btn-secondary"
+            >
+              View Reports
             </button>
             <button
               onClick={() => navigate('/campuses')}

@@ -7,8 +7,7 @@ from app.database import init_db
 
 # Import routers
 from app.routers import auth, submit
-from app.routers.admin import campuses, chairs, departments, semesters
-# from app.routers.admin import reports
+from app.routers.admin import campuses, chairs, departments, semesters, reports
 
 # Create FastAPI app
 app = FastAPI(
@@ -60,4 +59,4 @@ app.include_router(chairs.router, prefix=f"{settings.API_PREFIX}/admin/chairs", 
 app.include_router(departments.router, prefix=f"{settings.API_PREFIX}/admin/departments", tags=["Admin - Departments"])
 app.include_router(semesters.router, prefix=f"{settings.API_PREFIX}/admin/semesters", tags=["Admin - Semesters"])
 app.include_router(submit.router, prefix=f"{settings.API_PREFIX}/submit", tags=["Department Chair Submission"])
-# app.include_router(reports.router, prefix=f"{settings.API_PREFIX}/admin/reports", tags=["Admin - Reports"])
+app.include_router(reports.router, prefix=f"{settings.API_PREFIX}/admin/reports", tags=["Admin - Reports"])
