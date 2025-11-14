@@ -2,13 +2,16 @@
  * Admin Dashboard Component
  * Main dashboard for admin users
  */
+import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Home, Users, Building2, GraduationCap, Calendar } from 'lucide-react';
+import { LogOut, Home, Users, Building2, GraduationCap, Calendar, UserCircle } from 'lucide-react';
+import ProfileModal from '../admin/ProfileModal';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -43,6 +46,14 @@ const Dashboard = () => {
               <span className="text-white text-sm sm:text-base hidden md:inline">
                 {user?.full_name}
               </span>
+              <button
+                onClick={() => setShowProfileModal(true)}
+                className="flex items-center space-x-1 sm:space-x-2 bg-suscc-gold text-suscc-blue-dark px-3 sm:px-4 py-2 rounded-md hover:bg-suscc-gold-dark transition-colors text-sm sm:text-base font-semibold"
+                aria-label="Edit profile"
+              >
+                <UserCircle className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Profile</span>
+              </button>
               <button
                 onClick={handleLogout}
                 className="flex items-center space-x-1 sm:space-x-2 bg-white text-suscc-blue px-3 sm:px-4 py-2 rounded-md hover:bg-gray-100 transition-colors text-sm sm:text-base"
@@ -167,6 +178,12 @@ const Dashboard = () => {
             >
               Manage Departments
             </button>
+            <button
+              onClick={() => navigate('/users')}
+              className="btn-secondary"
+            >
+              Manage Users
+            </button>
           </div>
         </div>
 
@@ -191,6 +208,11 @@ const Dashboard = () => {
           </div>
         </div>
       </main>
+
+      {/* Profile Modal */}
+      {showProfileModal && (
+        <ProfileModal onClose={() => setShowProfileModal(false)} />
+      )}
     </div>
   );
 };
