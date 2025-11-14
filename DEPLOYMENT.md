@@ -21,6 +21,19 @@ cd /var/www/adjunct-tracker
 sudo bash deploy/deploy.sh
 ```
 
+## New Features
+
+This application now includes **User Management** and **Profile Editing** features:
+
+- **User Management** (`/users`) - Full CRUD operations for managing admin users
+- **Profile Editing** - Self-service profile and password management
+
+For comprehensive documentation on these features, including usage instructions, API endpoints, security considerations, and troubleshooting, see [NEW_FEATURES_SUMMARY.md](NEW_FEATURES_SUMMARY.md).
+
+**Important**: After first deployment, log in with the default admin credentials and immediately:
+1. Change the default admin password via the Profile button
+2. Create additional admin users as needed via Manage Users
+
 ## Manual Deployment Steps
 
 ### 1. System Dependencies
