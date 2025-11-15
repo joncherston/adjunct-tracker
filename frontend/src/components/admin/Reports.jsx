@@ -15,6 +15,7 @@ const Reports = () => {
   const [loading, setLoading] = useState(true);
   const [loadingReport, setLoadingReport] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [selectedCampus, setSelectedCampus] = useState('all');
 
   useEffect(() => {
     loadSemesters();
@@ -51,7 +52,8 @@ const Reports = () => {
       setLoadingReport(true);
       const response = await reportsAPI.getSemesterReport(selectedSemester.id);
       setReportData(response.data);
-      setSelectedDepartment('all'); // Reset filter when loading new report
+      setSelectedDepartment('all'); // Reset filters when loading new report
+      setSelectedCampus('all');
     } catch (error) {
       console.error('Error loading report:', error);
       toast.error('Failed to load report data');
@@ -110,22 +112,63 @@ const Reports = () => {
     return grouped;
   };
 
+  // Group assignments by campus (instructors can teach at multiple campuses)
+  const groupByCampus = () => {
+    if (!reportData) return {};
+
+    const grouped = {};
+    reportData.assignments.forEach(assignment => {
+      if (assignment.campus_assignments && assignment.campus_assignments.length > 0) {
+        assignment.campus_assignments.forEach(campusAssignment => {
+          const campusName = campusAssignment.campus.name;
+          if (!grouped[campusName]) {
+            grouped[campusName] = [];
+          }
+          grouped[campusName].push(assignment);
+        });
+      }
+    });
+
+    return grouped;
+  };
+
   // Get filtered assignments
   const getFilteredAssignments = () => {
     if (!reportData) return [];
 
-    if (selectedDepartment === 'all') {
-      return reportData.assignments;
+    let filtered = reportData.assignments;
+
+    // Filter by department
+    if (selectedDepartment !== 'all') {
+      filtered = filtered.filter(
+        assignment => assignment.department.name === selectedDepartment
+      );
     }
 
-    return reportData.assignments.filter(
-      assignment => assignment.department.name === selectedDepartment
-    );
+    // Filter by campus
+    if (selectedCampus !== 'all') {
+      filtered = filtered.filter(assignment =>
+        assignment.campus_assignments?.some(
+          ca => ca.campus.name === selectedCampus
+        )
+      );
+    }
+
+    return filtered;
+  };
+
+  // Count unique adjuncts in filtered results
+  const getUniqueAdjunctCount = (assignments) => {
+    const uniqueAdjuncts = new Set(assignments.map(a => a.adjunct.id));
+    return uniqueAdjuncts.size;
   };
 
   const groupedData = groupByDepartment();
+  const groupedByCampus = groupByCampus();
   const departments = Object.keys(groupedData).sort();
+  const campuses = Object.keys(groupedByCampus).sort();
   const filteredAssignments = getFilteredAssignments();
+  const filteredAdjunctCount = getUniqueAdjunctCount(filteredAssignments);
 
   // Count stats
   const submittedCount = reportData?.requests.filter(r => r.is_submitted).length || 0;
@@ -234,31 +277,96 @@ const Reports = () => {
               </div>
             </div>
 
-            {/* Department Filter */}
+            {/* Filters */}
             <div className="card mb-6 print:hidden">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Filter by Department
-              </label>
-              <select
-                value={selectedDepartment}
-                onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="input max-w-md"
-              >
-                <option value="all">All Departments ({reportData.assignments.length} adjuncts)</option>
-                {departments.map(dept => (
-                  <option key={dept} value={dept}>
-                    {dept} ({groupedData[dept].length})
-                  </option>
-                ))}
-              </select>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Filters</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Department Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Filter by Department
+                  </label>
+                  <select
+                    value={selectedDepartment}
+                    onChange={(e) => setSelectedDepartment(e.target.value)}
+                    className="input w-full"
+                  >
+                    <option value="all">All Departments</option>
+                    {departments.map(dept => (
+                      <option key={dept} value={dept}>
+                        {dept} ({getUniqueAdjunctCount(groupedData[dept])})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Campus Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Filter by Campus
+                  </label>
+                  <select
+                    value={selectedCampus}
+                    onChange={(e) => setSelectedCampus(e.target.value)}
+                    className="input w-full"
+                  >
+                    <option value="all">All Campuses</option>
+                    {campuses.map(campus => (
+                      <option key={campus} value={campus}>
+                        {campus} ({getUniqueAdjunctCount(groupedByCampus[campus])})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Active Filter Display */}
+              {(selectedDepartment !== 'all' || selectedCampus !== 'all') && (
+                <div className="mt-3 flex items-center gap-2 text-sm">
+                  <span className="text-gray-600">Active filters:</span>
+                  {selectedDepartment !== 'all' && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-suscc-blue text-white">
+                      {selectedDepartment}
+                      <button
+                        onClick={() => setSelectedDepartment('all')}
+                        className="ml-1.5 hover:text-gray-200"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+                  {selectedCampus !== 'all' && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-suscc-gold text-suscc-blue">
+                      {selectedCampus}
+                      <button
+                        onClick={() => setSelectedCampus('all')}
+                        className="ml-1.5 hover:text-gray-600"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+                  <button
+                    onClick={() => {
+                      setSelectedDepartment('all');
+                      setSelectedCampus('all');
+                    }}
+                    className="text-suscc-blue hover:underline text-xs"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Adjunct List */}
             <div className="card">
               <h2 className="text-xl font-bold text-suscc-blue mb-4">
-                {selectedDepartment === 'all' ? 'All Adjuncts' : selectedDepartment}
+                {selectedDepartment === 'all' && selectedCampus === 'all'
+                  ? 'All Adjuncts'
+                  : [selectedDepartment !== 'all' ? selectedDepartment : '', selectedCampus !== 'all' ? selectedCampus : ''].filter(Boolean).join(' - ')}
                 <span className="text-gray-600 font-normal text-base ml-2">
-                  ({filteredAssignments.length} instructor{filteredAssignments.length !== 1 ? 's' : ''})
+                  ({filteredAdjunctCount} unique instructor{filteredAdjunctCount !== 1 ? 's' : ''})
                 </span>
               </h2>
 
