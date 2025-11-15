@@ -67,14 +67,19 @@ const Reports = () => {
   const handleExportCSV = () => {
     if (!reportData) return;
 
-    const rows = [['Department', 'Adjunct Name', 'Email', 'Multi-Department']];
+    const rows = [['Department', 'Adjunct Name', 'Email', 'Campuses', 'Courses', 'Multi-Department']];
 
     reportData.assignments.forEach(assignment => {
       const isMultiDept = reportData.multi_department_adjunct_ids.includes(assignment.adjunct.id);
+      const campuses = assignment.campus_assignments?.map(ca => ca.campus.name).join('; ') || '';
+      const courses = assignment.course_assignments?.map(ca => ca.course.course_name).join('; ') || '';
+
       rows.push([
         assignment.department.name,
         assignment.adjunct.full_name,
         assignment.adjunct.email,
+        campuses,
+        courses,
         isMultiDept ? 'Yes' : 'No'
       ]);
     });
@@ -273,6 +278,12 @@ const Reports = () => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Email
                         </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Campus(es)
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Courses
+                        </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider print:hidden">
                           Status
                         </th>
@@ -294,6 +305,32 @@ const Reports = () => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                               {assignment.adjunct.email}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600">
+                              {assignment.campus_assignments && assignment.campus_assignments.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {assignment.campus_assignments.map((campusAssignment, idx) => (
+                                    <span key={idx} className="inline-block px-2 py-0.5 bg-suscc-gold-light text-suscc-blue text-xs rounded">
+                                      {campusAssignment.campus.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600">
+                              {assignment.course_assignments && assignment.course_assignments.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {assignment.course_assignments.map((courseAssignment, idx) => (
+                                    <span key={idx} className="inline-block px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">
+                                      {courseAssignment.course.course_name}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm print:hidden">
                               {isMultiDept && (

@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app.models.user import User
 from app.models.semester import Semester, SemesterRequest
-from app.models.adjunct import SemesterAdjunctAssignment, AdjunctInstructor
+from app.models.adjunct import SemesterAdjunctAssignment, AdjunctInstructor, AdjunctCampusAssignment, AdjunctCourseAssignment
 from app.models.department import Department
 from app.schemas.reports import SemesterReportResponse
 from app.utils.dependencies import get_current_active_user
@@ -40,7 +40,9 @@ async def get_semester_report(
     ).options(
         joinedload(SemesterAdjunctAssignment.adjunct),
         joinedload(SemesterAdjunctAssignment.department),
-        joinedload(SemesterAdjunctAssignment.semester_request).joinedload(SemesterRequest.semester)
+        joinedload(SemesterAdjunctAssignment.semester_request).joinedload(SemesterRequest.semester),
+        joinedload(SemesterAdjunctAssignment.campus_assignments).joinedload(AdjunctCampusAssignment.campus),
+        joinedload(SemesterAdjunctAssignment.course_assignments).joinedload(AdjunctCourseAssignment.course)
     ).filter(
         SemesterRequest.semester_id == semester_id,
         SemesterRequest.is_submitted == True  # Only show submitted data

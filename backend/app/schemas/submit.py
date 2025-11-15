@@ -10,6 +10,8 @@ class SubmitAdjunctData(BaseModel):
     """Schema for adding an adjunct to a semester request"""
     full_name: str
     email: EmailStr
+    campus_ids: List[int] = []  # Multiple campuses
+    course_names: List[str] = []  # Multiple courses
 
 
 class AdjunctSubmissionResponse(BaseModel):
@@ -30,11 +32,53 @@ class AdjunctInfo(BaseModel):
     }
 
 
+class CampusInfo(BaseModel):
+    """Nested schema for campus info"""
+    id: int
+    name: str
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class CourseInfo(BaseModel):
+    """Nested schema for course info"""
+    id: int
+    course_name: str
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class CampusAssignmentInfo(BaseModel):
+    """Schema for campus assignment"""
+    id: int
+    campus: CampusInfo
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class CourseAssignmentInfo(BaseModel):
+    """Schema for course assignment"""
+    id: int
+    course: CourseInfo
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
 class SemesterAdjunctAssignmentInfo(BaseModel):
     """Schema for semester adjunct assignment"""
     id: int
     adjunct_instructor_id: int
     adjunct: AdjunctInfo
+    campus_assignments: List[CampusAssignmentInfo] = []
+    course_assignments: List[CourseAssignmentInfo] = []
 
     model_config = {
         "from_attributes": True

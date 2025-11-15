@@ -10,7 +10,8 @@ from sqlalchemy import and_
 from app.database import get_db
 from app.models.semester import Semester, SemesterRequest
 from app.models.department import Department
-from app.models.adjunct import AdjunctInstructor, SemesterAdjunctAssignment
+from app.models.adjunct import AdjunctInstructor, SemesterAdjunctAssignment, AdjunctCampusAssignment, AdjunctCourseAssignment, Course
+from app.models.campus import Campus
 from app.schemas.submit import (
     SemesterRequestDetailResponse,
     SubmitAdjunctData,
@@ -20,6 +21,16 @@ from app.schemas.submit import (
 )
 
 router = APIRouter()
+
+
+@router.get("/campuses/all")
+async def get_all_campuses(db: Session = Depends(get_db)):
+    """
+    Get all available campuses for selection
+    Public endpoint - no authentication required
+    """
+    campuses = db.query(Campus).filter(Campus.is_active == True).order_by(Campus.name).all()
+    return [{"id": campus.id, "name": campus.name} for campus in campuses]
 
 
 @router.get("/{access_token}", response_model=SemesterRequestDetailResponse)
@@ -36,7 +47,9 @@ async def get_semester_request_by_token(
     semester_request = db.query(SemesterRequest).options(
         joinedload(SemesterRequest.semester),
         joinedload(SemesterRequest.department).joinedload(Department.chair),
-        joinedload(SemesterRequest.assignments).joinedload(SemesterAdjunctAssignment.adjunct)
+        joinedload(SemesterRequest.assignments).joinedload(SemesterAdjunctAssignment.adjunct),
+        joinedload(SemesterRequest.assignments).joinedload(SemesterAdjunctAssignment.campus_assignments).joinedload(AdjunctCampusAssignment.campus),
+        joinedload(SemesterRequest.assignments).joinedload(SemesterAdjunctAssignment.course_assignments).joinedload(AdjunctCourseAssignment.course)
     ).filter(SemesterRequest.access_token == access_token).first()
 
     if not semester_request:
@@ -101,6 +114,55 @@ async def add_or_update_adjunct(
         department_id=semester_request.department_id
     )
     db.add(assignment)
+    db.flush()  # Get assignment ID before adding related records
+
+    # Add campus assignments
+    for campus_id in adjunct_data.campus_ids:
+        # Verify campus exists
+        campus = db.query(Campus).filter(Campus.id == campus_id).first()
+        if not campus:
+            db.rollback()
+            raise HTTPException(status_code=400, detail=f"Campus with ID {campus_id} not found")
+
+        # Check if campus assignment already exists for this assignment
+        existing_campus = db.query(AdjunctCampusAssignment).filter(
+            AdjunctCampusAssignment.assignment_id == assignment.id,
+            AdjunctCampusAssignment.campus_id == campus_id
+        ).first()
+
+        if not existing_campus:
+            campus_assignment = AdjunctCampusAssignment(
+                assignment_id=assignment.id,
+                campus_id=campus_id
+            )
+            db.add(campus_assignment)
+
+    # Add course assignments
+    for course_name in adjunct_data.course_names:
+        course_name = course_name.strip()
+        if not course_name:
+            continue
+
+        # Get or create course
+        course = db.query(Course).filter(Course.course_name.ilike(course_name)).first()
+        if not course:
+            course = Course(course_name=course_name)
+            db.add(course)
+            db.flush()
+
+        # Check if course assignment already exists for this assignment
+        existing_course = db.query(AdjunctCourseAssignment).filter(
+            AdjunctCourseAssignment.assignment_id == assignment.id,
+            AdjunctCourseAssignment.course_id == course.id
+        ).first()
+
+        if not existing_course:
+            course_assignment = AdjunctCourseAssignment(
+                assignment_id=assignment.id,
+                course_id=course.id
+            )
+            db.add(course_assignment)
+
     db.commit()
     db.refresh(assignment)
 

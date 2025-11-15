@@ -16,11 +16,18 @@ const ChairSubmissionPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [formData, setFormData] = useState({ full_name: '', email: '' });
+  const [formData, setFormData] = useState({
+    full_name: '',
+    email: '',
+    campus_ids: [],
+    course_names: []
+  });
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [previousSemesters, setPreviousSemesters] = useState([]);
   const [loadingPrevious, setLoadingPrevious] = useState(false);
   const [copying, setCopying] = useState(false);
+  const [campuses, setCampuses] = useState([]);
+  const [courseInput, setCourseInput] = useState('');
 
   // Close modal with Escape key for accessibility
   useEscapeKey(() => setShowCopyModal(false), showCopyModal);
@@ -29,7 +36,20 @@ const ChairSubmissionPage = () => {
     if (token) {
       loadRequestData();
     }
+    loadCampuses();
   }, [token]);
+
+  const loadCampuses = async () => {
+    try {
+      const response = await fetch('/api/submit/campuses/all');
+      if (response.ok) {
+        const data = await response.json();
+        setCampuses(data);
+      }
+    } catch (error) {
+      console.error('Error loading campuses:', error);
+    }
+  };
 
   const loadRequestData = async () => {
     try {
@@ -55,7 +75,8 @@ const ChairSubmissionPage = () => {
     try {
       await submitAPI.addAdjunct(token, formData);
       toast.success('Adjunct added successfully');
-      setFormData({ full_name: '', email: '' });
+      setFormData({ full_name: '', email: '', campus_ids: [], course_names: [] });
+      setCourseInput('');
       setShowAddForm(false);
       loadRequestData(); // Refresh the list
     } catch (error) {
@@ -270,6 +291,8 @@ const ChairSubmissionPage = () => {
             <div className="mb-6 p-4 bg-suscc-gold-light border-2 border-suscc-gold rounded-lg">
               <form onSubmit={handleAddAdjunct}>
                 <h3 className="font-semibold text-suscc-blue mb-4">Add Adjunct Instructor</h3>
+
+                {/* Name and Email */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -298,18 +321,128 @@ const ChairSubmissionPage = () => {
                     />
                   </div>
                 </div>
+
+                {/* Campus Selection */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Campus(es) *
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {campuses.map((campus) => (
+                      <label key={campus.id} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.campus_ids.includes(campus.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData({
+                                ...formData,
+                                campus_ids: [...formData.campus_ids, campus.id]
+                              });
+                            } else {
+                              setFormData({
+                                ...formData,
+                                campus_ids: formData.campus_ids.filter(id => id !== campus.id)
+                              });
+                            }
+                          }}
+                          className="rounded border-gray-300 text-suscc-blue focus:ring-suscc-blue"
+                        />
+                        <span className="text-sm text-gray-700">{campus.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {formData.campus_ids.length === 0 && (
+                    <p className="text-xs text-gray-500 mt-1">Select at least one campus</p>
+                  )}
+                </div>
+
+                {/* Course Names */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Course(s) (optional)
+                  </label>
+
+                  {/* Course tags display */}
+                  {formData.course_names.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {formData.course_names.map((course, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-suscc-blue text-white"
+                        >
+                          {course}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFormData({
+                                ...formData,
+                                course_names: formData.course_names.filter((_, i) => i !== idx)
+                              });
+                            }}
+                            className="ml-2 hover:text-suscc-gold"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Course input */}
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={courseInput}
+                      onChange={(e) => setCourseInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (courseInput.trim() && !formData.course_names.includes(courseInput.trim())) {
+                            setFormData({
+                              ...formData,
+                              course_names: [...formData.course_names, courseInput.trim()]
+                            });
+                            setCourseInput('');
+                          }
+                        }
+                      }}
+                      className="input flex-1"
+                      placeholder="e.g., MTH 101, ENG 201 (press Enter to add)"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (courseInput.trim() && !formData.course_names.includes(courseInput.trim())) {
+                          setFormData({
+                            ...formData,
+                            course_names: [...formData.course_names, courseInput.trim()]
+                          });
+                          setCourseInput('');
+                        }
+                      }}
+                      className="btn-secondary"
+                      disabled={!courseInput.trim()}
+                    >
+                      <Plus className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Add courses one at a time</p>
+                </div>
+
                 <div className="flex space-x-3">
                   <button
                     type="button"
                     onClick={() => {
                       setShowAddForm(false);
-                      setFormData({ full_name: '', email: '' });
+                      setFormData({ full_name: '', email: '', campus_ids: [], course_names: [] });
+                      setCourseInput('');
                     }}
                     className="btn-secondary"
                   >
                     Cancel
                   </button>
-                  <button type="submit" className="btn-primary">
+                  <button type="submit" className="btn-primary" disabled={formData.campus_ids.length === 0}>
                     Add Adjunct
                   </button>
                 </div>
@@ -323,21 +456,57 @@ const ChairSubmissionPage = () => {
               {assignments.map((assignment) => (
                 <div
                   key={assignment.id}
-                  className="p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-between"
+                  className="p-4 bg-gray-50 rounded-lg border border-gray-200"
                 >
-                  <div>
-                    <p className="font-semibold text-gray-900">{assignment.adjunct.full_name}</p>
-                    <p className="text-sm text-gray-600">{assignment.adjunct.email}</p>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900">{assignment.adjunct.full_name}</p>
+                      <p className="text-sm text-gray-600 mb-2">{assignment.adjunct.email}</p>
+
+                      {/* Campuses */}
+                      {assignment.campus_assignments && assignment.campus_assignments.length > 0 && (
+                        <div className="flex items-center space-x-2 mb-1">
+                          <Building2 className="h-4 w-4 text-gray-500" />
+                          <div className="flex flex-wrap gap-1">
+                            {assignment.campus_assignments.map((campusAssignment) => (
+                              <span
+                                key={campusAssignment.id}
+                                className="inline-block px-2 py-0.5 bg-suscc-gold-light text-suscc-blue text-xs rounded"
+                              >
+                                {campusAssignment.campus.name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Courses */}
+                      {assignment.course_assignments && assignment.course_assignments.length > 0 && (
+                        <div className="flex items-center space-x-2">
+                          <GraduationCap className="h-4 w-4 text-gray-500" />
+                          <div className="flex flex-wrap gap-1">
+                            {assignment.course_assignments.map((courseAssignment) => (
+                              <span
+                                key={courseAssignment.id}
+                                className="inline-block px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded"
+                              >
+                                {courseAssignment.course.course_name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {!is_submitted && (
+                      <button
+                        onClick={() => handleRemoveAdjunct(assignment.id, assignment.adjunct.full_name)}
+                        className="text-danger hover:text-red-700 p-2 ml-4"
+                        title="Remove adjunct"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    )}
                   </div>
-                  {!is_submitted && (
-                    <button
-                      onClick={() => handleRemoveAdjunct(assignment.id, assignment.adjunct.full_name)}
-                      className="text-danger hover:text-red-700 p-2"
-                      title="Remove adjunct"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
-                  )}
                 </div>
               ))}
             </div>
