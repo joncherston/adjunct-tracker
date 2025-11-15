@@ -23,6 +23,7 @@ const ManageSemester = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState(null);
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [formData, setFormData] = useState({
     adjunct_id: null,
     department_id: null,
@@ -203,6 +204,11 @@ const ManageSemester = () => {
   const groupedAssignments = groupByDepartment();
   const departmentNames = Object.keys(groupedAssignments).sort();
 
+  // Filter departments based on selection
+  const filteredDepartmentNames = selectedDepartment === 'all'
+    ? departmentNames
+    : departmentNames.filter(name => name === selectedDepartment);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <AppHeader
@@ -223,25 +229,52 @@ const ManageSemester = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Semester Selector */}
+        {/* Filters */}
         <div className="card mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select Semester
-          </label>
-          <select
-            value={selectedSemester?.id || ''}
-            onChange={(e) => {
-              const semester = semesters.find(s => s.id === parseInt(e.target.value));
-              setSelectedSemester(semester);
-            }}
-            className="input max-w-md"
-          >
-            {semesters.map(semester => (
-              <option key={semester.id} value={semester.id}>
-                {semester.display_name}
-              </option>
-            ))}
-          </select>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filters</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Semester Selector */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Semester
+              </label>
+              <select
+                value={selectedSemester?.id || ''}
+                onChange={(e) => {
+                  const semester = semesters.find(s => s.id === parseInt(e.target.value));
+                  setSelectedSemester(semester);
+                  setSelectedDepartment('all'); // Reset department filter when semester changes
+                }}
+                className="input w-full"
+              >
+                {semesters.map(semester => (
+                  <option key={semester.id} value={semester.id}>
+                    {semester.display_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Department Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Filter by Department
+              </label>
+              <select
+                value={selectedDepartment}
+                onChange={(e) => setSelectedDepartment(e.target.value)}
+                className="input w-full"
+                disabled={!selectedSemester || departmentNames.length === 0}
+              >
+                <option value="all">All Departments ({assignments.length} total)</option>
+                {departmentNames.map(dept => (
+                  <option key={dept} value={dept}>
+                    {dept} ({groupedAssignments[dept].length})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Assignments List */}
@@ -264,7 +297,12 @@ const ManageSemester = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {departmentNames.map(deptName => (
+            {filteredDepartmentNames.length === 0 ? (
+              <div className="card text-center py-8">
+                <p className="text-gray-600">No departments match the filter</p>
+              </div>
+            ) : (
+              filteredDepartmentNames.map(deptName => (
               <div key={deptName} className="card">
                 <h2 className="text-xl font-bold text-suscc-blue mb-4">
                   {deptName}
@@ -323,7 +361,8 @@ const ManageSemester = () => {
                   ))}
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </div>
         )}
       </div>
