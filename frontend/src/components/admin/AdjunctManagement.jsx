@@ -196,8 +196,17 @@ const AdjunctManagement = () => {
 
       // Show results
       if (result.error_count > 0) {
-        toast.error(`Imported ${result.success_count} records with ${result.error_count} errors. Check console for details.`);
         console.error('Import errors:', result.errors);
+
+        // Show detailed error modal
+        const errorList = result.errors.map((err, idx) => `${idx + 1}. ${err}`).join('\n');
+        alert(`Import completed with ${result.error_count} errors:\n\n${errorList}\n\nSuccessfully imported: ${result.success_count} records`);
+
+        if (result.success_count > 0) {
+          toast.success(`Imported ${result.success_count} records (${result.error_count} errors)`);
+        } else {
+          toast.error(`Failed to import any records. See error details.`);
+        }
       } else {
         toast.success(`Successfully imported ${result.success_count} assignments. Created ${result.created_instructors} new instructors, found ${result.existing_instructors} existing.`);
       }
