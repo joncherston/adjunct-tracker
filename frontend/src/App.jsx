@@ -9,6 +9,7 @@ import DepartmentChairManagement from './components/admin/DepartmentChairManagem
 import DepartmentManagement from './components/admin/DepartmentManagement';
 import SemesterTracking from './components/admin/SemesterTracking';
 import CreateSemesterRequest from './components/admin/CreateSemesterRequest';
+import ManageSemester from './components/admin/ManageSemester';
 import ChairSubmissionPage from './components/submit/ChairSubmissionPage';
 import Reports from './components/admin/Reports';
 import Users from './components/admin/Users';
@@ -106,6 +107,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <CreateSemesterRequest />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Manage Semester Route */}
+          <Route
+            path="/semesters/manage"
+            element={
+              <ProtectedRoute>
+                <ManageSemester />
               </ProtectedRoute>
             }
           />

@@ -216,6 +216,12 @@ const Dashboard = () => {
               Track Semesters
             </button>
             <button
+              onClick={() => navigate('/semesters/manage')}
+              className="btn-secondary"
+            >
+              Manage Semester
+            </button>
+            <button
               onClick={() => navigate('/reports')}
               className="btn-secondary"
             >
