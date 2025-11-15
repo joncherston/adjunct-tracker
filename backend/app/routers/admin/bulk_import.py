@@ -128,6 +128,13 @@ async def bulk_import_adjuncts(
                 db.add(semester_request)
                 db.commit()
                 db.refresh(semester_request)
+            else:
+                # If request exists but not submitted, mark it as submitted for bulk import
+                if not semester_request.is_submitted:
+                    semester_request.is_submitted = True
+                    from datetime import datetime
+                    semester_request.submitted_at = datetime.utcnow()
+                    db.commit()
 
             # Check if assignment already exists
             existing_assignment = db.query(SemesterAdjunctAssignment).filter(
