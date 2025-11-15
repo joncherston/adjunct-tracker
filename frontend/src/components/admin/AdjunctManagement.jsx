@@ -179,8 +179,17 @@ const AdjunctManagement = () => {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || 'Failed to import data');
+        let errorMessage = 'Failed to import data';
+        try {
+          const error = await response.json();
+          errorMessage = error.detail || errorMessage;
+        } catch (parseError) {
+          // If we can't parse JSON, get the text response
+          const textResponse = await response.text();
+          console.error('Backend error response:', textResponse);
+          errorMessage = `Server error (${response.status}). Check console for details.`;
+        }
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();

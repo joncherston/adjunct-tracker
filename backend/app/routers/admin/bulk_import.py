@@ -2,6 +2,7 @@
 Bulk Import Routes
 Admin endpoints for bulk importing adjunct data
 """
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -37,10 +38,37 @@ async def bulk_import_adjuncts(
     created_instructors = 0
     existing_instructors = 0
 
+    # Parse semester name (e.g., "Fall 2025" -> type="Fall", year=2025)
+    semester_parts = import_data.semester_name.strip().split()
+    if len(semester_parts) != 2:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid semester name format. Expected 'Season YYYY' (e.g., 'Fall 2025'), got '{import_data.semester_name}'"
+        )
+
+    semester_type = semester_parts[0]
+    try:
+        semester_year = int(semester_parts[1])
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid year in semester name: '{semester_parts[1]}'"
+        )
+
     # Get or create semester
-    semester = db.query(Semester).filter(Semester.name == import_data.semester_name).first()
+    semester = db.query(Semester).filter(
+        Semester.semester_type == semester_type,
+        Semester.year == semester_year
+    ).first()
+
     if not semester:
-        semester = Semester(name=import_data.semester_name, is_active=True)
+        # Need to get current user for created_by_user_id
+        semester = Semester(
+            semester_type=semester_type,
+            year=semester_year,
+            is_active=True,
+            created_by_user_id=current_user.id
+        )
         db.add(semester)
         db.commit()
         db.refresh(semester)
@@ -94,6 +122,7 @@ async def bulk_import_adjuncts(
                 semester_request = SemesterRequest(
                     semester_id=semester.id,
                     department_id=department.id,
+                    access_token=str(uuid.uuid4()),
                     is_submitted=True  # Mark as submitted since we're importing data
                 )
                 db.add(semester_request)
