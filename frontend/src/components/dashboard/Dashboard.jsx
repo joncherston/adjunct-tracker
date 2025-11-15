@@ -2,7 +2,7 @@
  * Admin Dashboard Component
  * Main dashboard for admin users
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Home, Users, Building2, GraduationCap, Calendar, UserCircle } from 'lucide-react';
@@ -12,11 +12,31 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [departmentCount, setDepartmentCount] = useState(0);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
+
+  useEffect(() => {
+    const loadDepartments = async () => {
+      try {
+        const response = await fetch('/api/admin/departments', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setDepartmentCount(data.length);
+        }
+      } catch (error) {
+        console.error('Error loading departments:', error);
+      }
+    };
+    loadDepartments();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -130,10 +150,10 @@ const Dashboard = () => {
               Departments
             </h3>
             <p className="text-3xl font-bold text-suscc-blue mb-2">
-              0
+              {departmentCount}
             </p>
             <p className="text-sm text-gray-600">
-              No departments configured
+              {departmentCount === 0 ? 'No departments configured' : `${departmentCount} department${departmentCount === 1 ? '' : 's'} configured`}
             </p>
           </div>
         </div>
@@ -185,6 +205,12 @@ const Dashboard = () => {
               className="btn-secondary"
             >
               Manage Users
+            </button>
+            <button
+              onClick={() => navigate('/adjuncts')}
+              className="btn-secondary"
+            >
+              Manage Adjunct Instructors
             </button>
           </div>
         </div>

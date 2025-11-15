@@ -12,6 +12,7 @@ import CreateSemesterRequest from './components/admin/CreateSemesterRequest';
 import ChairSubmissionPage from './components/submit/ChairSubmissionPage';
 import Reports from './components/admin/Reports';
 import Users from './components/admin/Users';
+import AdjunctManagement from './components/admin/AdjunctManagement';
 
 function App() {
   return (
@@ -125,6 +126,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <Users />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Adjunct Instructor Management Route */}
+          <Route
+            path="/adjuncts"
+            element={
+              <ProtectedRoute>
+                <AdjunctManagement />
               </ProtectedRoute>
             }
           />
