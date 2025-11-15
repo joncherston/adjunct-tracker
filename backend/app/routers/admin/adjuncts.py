@@ -55,23 +55,24 @@ async def create_adjunct_instructor(
     """
     Create a new adjunct instructor
 
-    Validates that the email is unique
+    Validates that the email is unique (if provided)
     """
-    # Check if email already exists
-    existing_instructor = db.query(AdjunctInstructor).filter(
-        AdjunctInstructor.email.ilike(instructor_data.email)
-    ).first()
+    # Check if email already exists (only if email is provided)
+    if instructor_data.email:
+        existing_instructor = db.query(AdjunctInstructor).filter(
+            AdjunctInstructor.email.ilike(instructor_data.email)
+        ).first()
 
-    if existing_instructor:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Adjunct instructor with email '{instructor_data.email}' already exists"
-        )
+        if existing_instructor:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Adjunct instructor with email '{instructor_data.email}' already exists"
+            )
 
     # Create new adjunct instructor
     instructor = AdjunctInstructor(
         full_name=instructor_data.full_name,
-        email=instructor_data.email.lower()
+        email=instructor_data.email.lower() if instructor_data.email else None
     )
 
     db.add(instructor)
@@ -100,7 +101,7 @@ async def update_adjunct_instructor(
         raise HTTPException(status_code=404, detail="Adjunct instructor not found")
 
     # Check if email is being changed and if new email already exists
-    if instructor_data.email.lower() != instructor.email.lower():
+    if instructor_data.email and (not instructor.email or instructor_data.email.lower() != instructor.email.lower()):
         existing_instructor = db.query(AdjunctInstructor).filter(
             AdjunctInstructor.email.ilike(instructor_data.email),
             AdjunctInstructor.id != instructor_id
@@ -114,7 +115,7 @@ async def update_adjunct_instructor(
 
     # Update instructor
     instructor.full_name = instructor_data.full_name
-    instructor.email = instructor_data.email.lower()
+    instructor.email = instructor_data.email.lower() if instructor_data.email else None
 
     db.commit()
     db.refresh(instructor)

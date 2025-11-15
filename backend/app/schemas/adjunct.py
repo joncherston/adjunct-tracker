@@ -2,13 +2,14 @@
 Pydantic schemas for Adjunct Instructor
 """
 from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel, EmailStr, field_validator
 
 
 class AdjunctInstructorBase(BaseModel):
     """Base schema for adjunct instructor"""
     full_name: str
-    email: EmailStr
+    email: Optional[EmailStr] = None
 
     @field_validator('full_name')
     @classmethod

@@ -7,6 +7,7 @@ import { Calendar, Plus, Mail, CheckCircle, Clock, AlertCircle, Users } from 'lu
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { semestersAPI } from '../../services/api';
+import AppHeader from '../common/AppHeader';
 
 const SemesterTracking = () => {
   const navigate = useNavigate();
@@ -72,28 +73,20 @@ const SemesterTracking = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-suscc-gold p-3 rounded-lg">
-                <Calendar className="h-6 w-6 text-suscc-blue-dark" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-suscc-blue">Semester Tracking</h1>
-                <p className="text-sm text-gray-600">Track adjunct request submissions</p>
-              </div>
-            </div>
-            <button
-              onClick={() => navigate('/semesters/create')}
-              className="btn-primary flex items-center space-x-2"
-            >
-              <Plus className="h-5 w-5" />
-              <span>Create New Request</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <AppHeader
+        icon={Calendar}
+        title="Semester Tracking"
+        subtitle="Track adjunct request submissions"
+        actions={
+          <button
+            onClick={() => navigate('/semesters/create')}
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Create New Request</span>
+          </button>
+        }
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

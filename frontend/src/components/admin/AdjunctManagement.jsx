@@ -64,8 +64,8 @@ const AdjunctManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.full_name.trim() || !formData.email.trim()) {
-      toast.error('Name and email are required');
+    if (!formData.full_name.trim()) {
+      toast.error('Name is required');
       return;
     }
 
@@ -207,15 +207,17 @@ const AdjunctManagement = () => {
                   </div>
                 </div>
 
-                <div className="mb-4 flex items-center text-sm text-gray-600">
-                  <Mail className="h-4 w-4 mr-2 text-gray-400" />
-                  <a
-                    href={`mailto:${adjunct.email}`}
-                    className="hover:text-suscc-blue transition-colors"
-                  >
-                    {adjunct.email}
-                  </a>
-                </div>
+                {adjunct.email && (
+                  <div className="mb-4 flex items-center text-sm text-gray-600">
+                    <Mail className="h-4 w-4 mr-2 text-gray-400" />
+                    <a
+                      href={`mailto:${adjunct.email}`}
+                      className="hover:text-suscc-blue transition-colors"
+                    >
+                      {adjunct.email}
+                    </a>
+                  </div>
+                )}
 
                 <div className="flex space-x-2">
                   <button
@@ -279,7 +281,7 @@ const AdjunctManagement = () => {
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address *
+                  Email Address (optional)
                 </label>
                 <input
                   type="email"
@@ -287,7 +289,6 @@ const AdjunctManagement = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="input"
                   placeholder="adjunct@email.com"
-                  required
                 />
               </div>
 
