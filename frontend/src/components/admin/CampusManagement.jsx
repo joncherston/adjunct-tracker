@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { Building2, Plus, Edit2, Trash2, Search, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { campusesAPI } from '../../services/api';
+import AppHeader from '../common/AppHeader';
 
 const CampusManagement = () => {
   const [campuses, setCampuses] = useState([]);
@@ -106,28 +107,20 @@ const CampusManagement = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-suscc-gold p-3 rounded-lg">
-                <Building2 className="h-6 w-6 text-suscc-blue-dark" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-suscc-blue">Campus Management</h1>
-                <p className="text-sm text-gray-600">Manage campus locations</p>
-              </div>
-            </div>
-            <button
-              onClick={handleCreate}
-              className="btn-primary flex items-center space-x-2"
-            >
-              <Plus className="h-5 w-5" />
-              <span>Add Campus</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <AppHeader
+        icon={Building2}
+        title="Campus Management"
+        subtitle="Manage campus locations"
+        actions={
+          <button
+            onClick={handleCreate}
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Add Campus</span>
+          </button>
+        }
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

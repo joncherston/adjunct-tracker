@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { FileText, AlertTriangle, Users, Download, Printer } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { semestersAPI, reportsAPI } from '../../services/api';
+import AppHeader from '../common/AppHeader';
 
 const Reports = () => {
   const [semesters, setSemesters] = useState([]);
@@ -128,58 +129,52 @@ const Reports = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 print:shadow-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-suscc-blue p-3 rounded-lg">
-                <FileText className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-suscc-blue">Adjunct Reports</h1>
-                <p className="text-sm text-gray-600">View submitted adjunct instructor data</p>
-              </div>
-            </div>
-            <div className="flex space-x-2 print:hidden">
-              <button
-                onClick={handleExportCSV}
-                disabled={!reportData || reportData.assignments.length === 0}
-                className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
-              >
-                <Download className="h-5 w-5" />
-                <span>Export CSV</span>
-              </button>
-              <button
-                onClick={handlePrint}
-                disabled={!reportData || reportData.assignments.length === 0}
-                className="btn-primary flex items-center space-x-2 disabled:opacity-50"
-              >
-                <Printer className="h-5 w-5" />
-                <span>Print</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Semester Selector */}
-          <div className="mt-6 print:hidden">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Semester
-            </label>
-            <select
-              value={selectedSemester?.id || ''}
-              onChange={(e) => {
-                const semester = semesters.find(s => s.id === parseInt(e.target.value));
-                setSelectedSemester(semester);
-              }}
-              className="input max-w-md"
+      <AppHeader
+        icon={FileText}
+        title="Adjunct Reports"
+        subtitle="View submitted adjunct instructor data"
+        actions={
+          <div className="flex space-x-2 print:hidden">
+            <button
+              onClick={handleExportCSV}
+              disabled={!reportData || reportData.assignments.length === 0}
+              className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
             >
-              {semesters.map(semester => (
-                <option key={semester.id} value={semester.id}>
-                  {semester.display_name}
-                </option>
-              ))}
-            </select>
+              <Download className="h-5 w-5" />
+              <span>Export CSV</span>
+            </button>
+            <button
+              onClick={handlePrint}
+              disabled={!reportData || reportData.assignments.length === 0}
+              className="btn-primary flex items-center space-x-2 disabled:opacity-50"
+            >
+              <Printer className="h-5 w-5" />
+              <span>Print</span>
+            </button>
           </div>
+        }
+      />
+
+      {/* Semester Selector */}
+      <div className="bg-white border-b border-gray-200 print:shadow-none print:hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Select Semester
+          </label>
+          <select
+            value={selectedSemester?.id || ''}
+            onChange={(e) => {
+              const semester = semesters.find(s => s.id === parseInt(e.target.value));
+              setSelectedSemester(semester);
+            }}
+            className="input max-w-md"
+          >
+            {semesters.map(semester => (
+              <option key={semester.id} value={semester.id}>
+                {semester.display_name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

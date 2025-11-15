@@ -7,6 +7,7 @@ import { Calendar, Send, CheckSquare, Square, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { semestersAPI, departmentsAPI } from '../../services/api';
+import AppHeader from '../common/AppHeader';
 
 const CreateSemesterRequest = () => {
   const navigate = useNavigate();
@@ -110,28 +111,25 @@ const CreateSemesterRequest = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => navigate('/semesters')}
-              className="text-gray-600 hover:text-gray-900"
-            >
-              <ArrowLeft className="h-6 w-6" />
-            </button>
-            <div className="flex items-center space-x-3">
-              <div className="bg-suscc-gold p-3 rounded-lg">
-                <Calendar className="h-6 w-6 text-suscc-blue-dark" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-suscc-blue">Create Semester Request</h1>
-                <p className="text-sm text-gray-600">Send adjunct requests to department chairs</p>
-              </div>
-            </div>
-          </div>
+      <AppHeader
+        icon={Calendar}
+        title="Create Semester Request"
+        subtitle="Send adjunct requests to department chairs"
+        actions={
+          <button
+            onClick={() => navigate('/semesters')}
+            className="btn-secondary flex items-center space-x-2"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span>Back to Semesters</span>
+          </button>
+        }
+      />
 
-          {/* Progress Steps */}
-          <div className="mt-6 flex items-center justify-center space-x-4">
+      {/* Progress Steps */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-center space-x-4">
             <div className={`flex items-center ${step >= 1 ? 'text-suscc-blue' : 'text-gray-400'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step >= 1 ? 'bg-suscc-blue text-white' : 'bg-gray-200'}`}>
                 1

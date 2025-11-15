@@ -3,7 +3,7 @@
  * Full CRUD interface for managing adjunct instructors
  */
 import { useState, useEffect } from 'react';
-import { UserCircle, Plus, Edit2, Trash2, Search, X, Mail } from 'lucide-react';
+import { UserCircle, Plus, Edit2, Trash2, Search, X, Mail, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AppHeader from '../common/AppHeader';
 
@@ -12,8 +12,11 @@ const AdjunctManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showBulkImportModal, setShowBulkImportModal] = useState(false);
   const [editingAdjunct, setEditingAdjunct] = useState(null);
   const [formData, setFormData] = useState({ full_name: '', email: '' });
+  const [bulkImportData, setBulkImportData] = useState('');
+  const [semesterName, setSemesterName] = useState('Fall 2025');
   const [submitting, setSubmitting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
@@ -126,10 +129,85 @@ const AdjunctManagement = () => {
     }
   };
 
+  const handleBulkImport = async (e) => {
+    e.preventDefault();
+
+    if (!bulkImportData.trim()) {
+      toast.error('Please enter data to import');
+      return;
+    }
+
+    if (!semesterName.trim()) {
+      toast.error('Semester name is required');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      // Parse CSV data into rows
+      const lines = bulkImportData.trim().split('\n');
+      const rows = lines
+        .map(line => {
+          const parts = line.split(',').map(p => p.trim());
+          if (parts.length < 3) return null;
+
+          return {
+            full_name: parts[0],
+            department_name: parts[1],
+            campus_name: parts[2],
+            email: parts[3] || null
+          };
+        })
+        .filter(row => row !== null);
+
+      if (rows.length === 0) {
+        toast.error('No valid data to import. Please check the format.');
+        return;
+      }
+
+      const response = await fetch('/api/admin/bulk-import/adjuncts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        },
+        body: JSON.stringify({
+          semester_name: semesterName,
+          rows: rows
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to import data');
+      }
+
+      const result = await response.json();
+
+      // Show results
+      if (result.error_count > 0) {
+        toast.error(`Imported ${result.success_count} records with ${result.error_count} errors. Check console for details.`);
+        console.error('Import errors:', result.errors);
+      } else {
+        toast.success(`Successfully imported ${result.success_count} assignments. Created ${result.created_instructors} new instructors, found ${result.existing_instructors} existing.`);
+      }
+
+      setShowBulkImportModal(false);
+      setBulkImportData('');
+      loadAdjuncts();
+    } catch (error) {
+      console.error('Error bulk importing:', error);
+      toast.error(error.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   // Filter adjuncts based on search term
   const filteredAdjuncts = adjuncts.filter(adjunct =>
     adjunct.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    adjunct.email.toLowerCase().includes(searchTerm.toLowerCase())
+    (adjunct.email && adjunct.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -140,13 +218,22 @@ const AdjunctManagement = () => {
         title="Adjunct Instructor Management"
         subtitle="Manage adjunct instructor database"
         actions={
-          <button
-            onClick={handleCreate}
-            className="btn-primary flex items-center space-x-2"
-          >
-            <Plus className="h-5 w-5" />
-            <span>Add Adjunct</span>
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={() => setShowBulkImportModal(true)}
+              className="btn-secondary flex items-center space-x-2"
+            >
+              <Upload className="h-5 w-5" />
+              <span>Bulk Import</span>
+            </button>
+            <button
+              onClick={handleCreate}
+              className="btn-primary flex items-center space-x-2"
+            >
+              <Plus className="h-5 w-5" />
+              <span>Add Adjunct</span>
+            </button>
+          </div>
         }
       />
 
@@ -356,6 +443,108 @@ const AdjunctManagement = () => {
                 Delete
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Import Modal */}
+      {showBulkImportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <div className="bg-suscc-blue p-3 rounded-lg">
+                  <Upload className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-suscc-blue">Bulk Import Adjunct Instructors</h2>
+                  <p className="text-sm text-gray-600">Import multiple adjuncts with semester assignments</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowBulkImportModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleBulkImport} className="p-6">
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Semester Name *
+                </label>
+                <input
+                  type="text"
+                  value={semesterName}
+                  onChange={(e) => setSemesterName(e.target.value)}
+                  className="input"
+                  placeholder="e.g., Fall 2025"
+                  required
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Import Data *
+                </label>
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-3">
+                  <p className="text-sm text-gray-700 mb-2">
+                    <strong>Format:</strong> Enter one row per line in CSV format:
+                  </p>
+                  <code className="text-xs bg-white px-2 py-1 rounded block mb-2">
+                    Full Name, Department Name, Campus Name, Email (optional)
+                  </code>
+                  <p className="text-xs text-gray-600 mb-2">
+                    <strong>Example:</strong>
+                  </p>
+                  <code className="text-xs bg-white px-2 py-1 rounded block">
+                    John Smith, Mathematics, Opelika, jsmith@example.com<br />
+                    Jane Doe, English, Wadley<br />
+                    Bob Johnson, Science, Valley, bjohnson@example.com
+                  </code>
+                </div>
+                <textarea
+                  value={bulkImportData}
+                  onChange={(e) => setBulkImportData(e.target.value)}
+                  className="input font-mono text-sm"
+                  rows="12"
+                  placeholder="Enter CSV data here..."
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Note: Departments and campuses must already exist in the system. Semester requests must be created for each department.
+                </p>
+              </div>
+
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowBulkImportModal(false)}
+                  className="flex-1 btn-secondary"
+                  disabled={submitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 btn-primary"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <span className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Importing...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Import Data
+                    </span>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

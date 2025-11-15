@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { GraduationCap, Plus, Edit2, Trash2, Search, X, Users } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { departmentsAPI, chairsAPI } from '../../services/api';
+import AppHeader from '../common/AppHeader';
 
 const DepartmentManagement = () => {
   const [departments, setDepartments] = useState([]);
@@ -126,28 +127,20 @@ const DepartmentManagement = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-success p-3 rounded-lg">
-                <GraduationCap className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-suscc-blue">Department Management</h1>
-                <p className="text-sm text-gray-600">Manage academic departments</p>
-              </div>
-            </div>
-            <button
-              onClick={handleCreate}
-              className="btn-primary flex items-center space-x-2"
-            >
-              <Plus className="h-5 w-5" />
-              <span>Add Department</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <AppHeader
+        icon={GraduationCap}
+        title="Department Management"
+        subtitle="Manage academic departments"
+        actions={
+          <button
+            onClick={handleCreate}
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Add Department</span>
+          </button>
+        }
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
