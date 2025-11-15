@@ -32,7 +32,7 @@ const Dashboard = () => {
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
                 <img
-                  src="https://jonathanherston.com/wp-content/uploads/2025/11/SU-Logo-e1763179867451.png"
+                  src="https://jonathanherston.com/wp-content/uploads/2025/11/Gemini_Generated_Image_scqmckscqmckscqm.png"
                   alt="Southern Union State Community College"
                   className="h-10 w-auto"
                 />
