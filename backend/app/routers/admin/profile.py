@@ -61,7 +61,7 @@ class PasswordChange(BaseModel):
         return v
 
 
-@router.get("/", response_model=ProfileResponse)
+@router.get("", response_model=ProfileResponse)
 async def get_profile(
     current_user: User = Depends(get_current_active_user)
 ):
@@ -69,7 +69,7 @@ async def get_profile(
     return current_user
 
 
-@router.put("/", response_model=ProfileResponse)
+@router.put("", response_model=ProfileResponse)
 async def update_profile(
     profile_data: ProfileUpdate,
     db: Session = Depends(get_db),
