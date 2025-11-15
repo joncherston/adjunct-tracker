@@ -41,6 +41,10 @@ def send_semester_request_email(
         deadline_text = f"\n\n**Deadline:** {deadline}" if deadline else ""
         custom_text = f"\n\n**Message from Administration:**\n{custom_message}" if custom_message else ""
 
+        # Prepare HTML custom message (avoid backslashes in f-strings for Python 3.11+)
+        newline = '\n'
+        custom_message_html = custom_message.replace(newline, '<br>') if custom_message else ''
+
         html_content = f"""
         <html>
         <head>
@@ -69,7 +73,7 @@ def send_semester_request_email(
 
                     {'<div class="deadline"><strong>⏰ Deadline:</strong> ' + deadline + '</div>' if deadline else ''}
 
-                    {'<div class="custom-message"><strong>📝 Message from Administration:</strong><br>' + custom_message.replace('\n', '<br>') + '</div>' if custom_message else ''}
+                    {'<div class="custom-message"><strong>📝 Message from Administration:</strong><br>' + custom_message_html + '</div>' if custom_message_html else ''}
 
                     <p>Please click the button below to access the secure form and submit your department's adjunct instructor information:</p>
 
