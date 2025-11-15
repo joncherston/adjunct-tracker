@@ -58,10 +58,9 @@ def create_default_admin():
             # Create default admin user
             admin = User(
                 email=settings.DEFAULT_ADMIN_EMAIL,
-                name=settings.DEFAULT_ADMIN_NAME,
+                full_name=settings.DEFAULT_ADMIN_NAME,
                 password_hash=hash_password(settings.DEFAULT_ADMIN_PASSWORD),
-                is_active=True,
-                is_admin=True
+                is_active=True
             )
             db.add(admin)
             db.commit()
