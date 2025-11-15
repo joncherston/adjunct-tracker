@@ -13,6 +13,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [departmentCount, setDepartmentCount] = useState(0);
+  const [campusCount, setCampusCount] = useState(0);
 
   const handleLogout = async () => {
     await logout();
@@ -35,7 +36,25 @@ const Dashboard = () => {
         console.error('Error loading departments:', error);
       }
     };
+
+    const loadCampuses = async () => {
+      try {
+        const response = await fetch('/api/admin/campuses', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setCampusCount(data.length);
+        }
+      } catch (error) {
+        console.error('Error loading campuses:', error);
+      }
+    };
+
     loadDepartments();
+    loadCampuses();
   }, []);
 
   return (
@@ -132,10 +151,10 @@ const Dashboard = () => {
               Campuses
             </h3>
             <p className="text-3xl font-bold text-suscc-blue mb-2">
-              3
+              {campusCount}
             </p>
             <p className="text-sm text-gray-600">
-              Wadley, Opelika, Valley
+              {campusCount === 0 ? 'No campuses configured' : `${campusCount} campus${campusCount === 1 ? '' : 'es'} configured`}
             </p>
           </div>
 

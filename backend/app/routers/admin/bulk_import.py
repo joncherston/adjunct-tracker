@@ -90,10 +90,15 @@ async def bulk_import_adjuncts(
             ).first()
 
             if not semester_request:
-                # Need to create a semester request
-                # For now, skip if no request exists
-                errors.append(f"Row {idx}: No semester request found for {department.name}")
-                continue
+                # Create a semester request automatically for bulk import
+                semester_request = SemesterRequest(
+                    semester_id=semester.id,
+                    department_id=department.id,
+                    is_submitted=True  # Mark as submitted since we're importing data
+                )
+                db.add(semester_request)
+                db.commit()
+                db.refresh(semester_request)
 
             # Check if assignment already exists
             existing_assignment = db.query(SemesterAdjunctAssignment).filter(
