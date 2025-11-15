@@ -44,7 +44,7 @@ async def get_semesters(
 
     if include_requests:
         query = query.options(
-            joinedload(Semester.requests).joinedload(SemesterRequest.department)
+            joinedload(Semester.requests).joinedload(SemesterRequest.department).joinedload(Department.chair)
         )
 
     if not include_inactive:
@@ -62,7 +62,7 @@ async def get_semester(
 ):
     """Get a single semester by ID with all its requests"""
     semester = db.query(Semester).options(
-        joinedload(Semester.requests).joinedload(SemesterRequest.department)
+        joinedload(Semester.requests).joinedload(SemesterRequest.department).joinedload(Department.chair)
     ).filter(Semester.id == semester_id).first()
 
     if not semester:

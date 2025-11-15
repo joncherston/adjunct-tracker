@@ -13,7 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added explicit SQL table joins for Department and AdjunctInstructor tables
   - Query now properly orders results by department and instructor name
   - Location: `backend/app/routers/admin/reports.py:38-47`
-  - Commit: `98828bf`
+
+- **"No Chair Assigned" Display Issue** (2025-11-15)
+  - Fixed missing chair information in Semester Tracking page
+  - Added chair relationship loading to semester requests query
+  - Department chairs now properly display in semester tracking view
+  - Location: `backend/app/routers/admin/semesters.py:47,65`
+
+### Known Issues
+- **Email Notifications**
+  - Emails require valid Brevo API key in `.env` file (`BREVO_API_KEY`)
+  - If API key is missing/invalid, emails fail silently (logged to console only)
+  - To enable emails: Sign up at https://www.brevo.com and add API key to `.env`
+  - Email sending is triggered when creating new semester requests (not during bulk import)
+  - Bulk imported data is marked as "submitted" and does not trigger email notifications
 
 ## [1.1.0] - 2024-11-14
 
