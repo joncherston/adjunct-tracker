@@ -36,7 +36,14 @@ async def get_semester_report(
 
     # Get all assignments for this semester with related data
     assignments = db.query(SemesterAdjunctAssignment).join(
-        SemesterRequest
+        SemesterRequest,
+        SemesterAdjunctAssignment.semester_request_id == SemesterRequest.id
+    ).join(
+        Department,
+        SemesterAdjunctAssignment.department_id == Department.id
+    ).join(
+        AdjunctInstructor,
+        SemesterAdjunctAssignment.adjunct_instructor_id == AdjunctInstructor.id
     ).options(
         joinedload(SemesterAdjunctAssignment.adjunct),
         joinedload(SemesterAdjunctAssignment.department),
