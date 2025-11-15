@@ -24,5 +24,6 @@ RUN mkdir -p /app/data
 EXPOSE 8000
 
 # Run database migrations and start the application
-CMD alembic upgrade head && \
+CMD python run_migrations.py && \
+    alembic upgrade head && \
     uvicorn app.main:app --host 0.0.0.0 --port 8000
