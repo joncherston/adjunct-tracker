@@ -20,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Department chairs now properly display in semester tracking view
   - Location: `backend/app/routers/admin/semesters.py:47,65`
 
+- **Bulk Import Not Showing in Reports** (2025-11-15)
+  - Fixed bulk imported adjuncts not appearing in reports
+  - Issue: Bulk import didn't mark existing semester requests as submitted
+  - Now automatically marks requests as submitted during bulk import
+  - Location: `backend/app/routers/admin/bulk_import.py:131-137`
+
 ### Known Issues
 - **Email Notifications**
   - Emails require valid Brevo API key in `.env` file (`BREVO_API_KEY`)
