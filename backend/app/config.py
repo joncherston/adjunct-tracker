@@ -29,6 +29,11 @@ class Settings(BaseSettings):
     FROM_NAME: str = "SUSCC Adjunct Committee"
     ADMIN_EMAIL: str = "adjunct-chair@suscholarsbowl.com"
 
+    # Default Admin User
+    DEFAULT_ADMIN_EMAIL: str = "admin@suscc.edu"
+    DEFAULT_ADMIN_PASSWORD: str = "ChangeMe123!"
+    DEFAULT_ADMIN_NAME: str = "System Administrator"
+
     # CORS
     FRONTEND_URL: str = "http://localhost:5173"
     ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
