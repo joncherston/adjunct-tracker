@@ -42,3 +42,34 @@ def get_db():
 def init_db():
     """Initialize database - create all tables"""
     Base.metadata.create_all(bind=engine)
+
+
+def create_default_admin():
+    """Create default admin user if it doesn't exist"""
+    from app.models.user import User
+    from app.utils.security import hash_password
+
+    db = SessionLocal()
+    try:
+        # Check if admin user already exists
+        admin = db.query(User).filter(User.email == settings.DEFAULT_ADMIN_EMAIL).first()
+
+        if not admin:
+            # Create default admin user
+            admin = User(
+                email=settings.DEFAULT_ADMIN_EMAIL,
+                name=settings.DEFAULT_ADMIN_NAME,
+                password_hash=hash_password(settings.DEFAULT_ADMIN_PASSWORD),
+                is_active=True,
+                is_admin=True
+            )
+            db.add(admin)
+            db.commit()
+            print(f"✓ Created default admin user: {settings.DEFAULT_ADMIN_EMAIL}")
+        else:
+            print(f"✓ Default admin user already exists: {settings.DEFAULT_ADMIN_EMAIL}")
+    except Exception as e:
+        print(f"✗ Error creating default admin user: {e}")
+        db.rollback()
+    finally:
+        db.close()

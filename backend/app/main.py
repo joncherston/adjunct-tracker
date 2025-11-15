@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.database import init_db
+from app.database import init_db, create_default_admin
 
 # Import routers
 from app.routers import auth, submit
@@ -32,6 +32,7 @@ app.add_middleware(
 async def startup_event():
     """Initialize database on startup"""
     init_db()
+    create_default_admin()
     print(f"✓ {settings.APP_NAME} started successfully")
     print(f"✓ API Documentation: http://localhost:8000/docs")
 
