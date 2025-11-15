@@ -4,7 +4,7 @@ Admin endpoints for managing department chairs
 """
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.database import get_db
 from app.models.user import User
@@ -30,7 +30,7 @@ async def get_department_chairs(
 
     - **include_inactive**: If True, includes inactive chairs (default: False)
     """
-    query = db.query(DepartmentChair)
+    query = db.query(DepartmentChair).options(joinedload(DepartmentChair.departments))
 
     if not include_inactive:
         query = query.filter(DepartmentChair.is_active == True)
@@ -46,7 +46,9 @@ async def get_department_chair(
     current_user: User = Depends(get_current_active_user)
 ):
     """Get a single department chair by ID"""
-    chair = db.query(DepartmentChair).filter(DepartmentChair.id == chair_id).first()
+    chair = db.query(DepartmentChair).options(
+        joinedload(DepartmentChair.departments)
+    ).filter(DepartmentChair.id == chair_id).first()
 
     if not chair:
         raise HTTPException(status_code=404, detail="Department chair not found")
@@ -85,6 +87,11 @@ async def create_department_chair(
     db.add(chair)
     db.commit()
     db.refresh(chair)
+
+    # Reload with departments
+    chair = db.query(DepartmentChair).options(
+        joinedload(DepartmentChair.departments)
+    ).filter(DepartmentChair.id == chair.id).first()
 
     return chair
 
@@ -126,6 +133,11 @@ async def update_department_chair(
 
     db.commit()
     db.refresh(chair)
+
+    # Reload with departments
+    chair = db.query(DepartmentChair).options(
+        joinedload(DepartmentChair.departments)
+    ).filter(DepartmentChair.id == chair.id).first()
 
     return chair
 

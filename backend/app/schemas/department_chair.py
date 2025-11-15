@@ -2,6 +2,7 @@
 Pydantic schemas for Department Chair
 """
 from datetime import datetime
+from typing import List
 from pydantic import BaseModel, EmailStr, field_validator
 
 
@@ -33,10 +34,21 @@ class DepartmentChairUpdate(DepartmentChairBase):
     pass
 
 
+class DepartmentInfo(BaseModel):
+    """Nested schema for department info"""
+    id: int
+    name: str
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
 class DepartmentChairResponse(DepartmentChairBase):
     """Schema for department chair response"""
     id: int
     is_active: bool
+    departments: List[DepartmentInfo] = []
     created_at: datetime
     updated_at: datetime
 

@@ -204,6 +204,25 @@ const DepartmentChairManagement = () => {
                   </a>
                 </div>
 
+                {/* Departments */}
+                {chair.departments && chair.departments.length > 0 && (
+                  <div className="mb-4 pb-4 border-b border-gray-200">
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+                      Departments
+                    </h4>
+                    <div className="flex flex-wrap gap-1">
+                      {chair.departments.map((dept) => (
+                        <span
+                          key={dept.id}
+                          className="inline-flex items-center px-2 py-1 bg-suscc-blue-light bg-opacity-20 text-suscc-blue text-xs rounded-md"
+                        >
+                          {dept.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleEdit(chair)}
