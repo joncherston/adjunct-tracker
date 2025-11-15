@@ -8,7 +8,8 @@ from pydantic import BaseModel, EmailStr, field_validator
 
 from app.database import get_db
 from app.models.user import User
-from app.utils.security import get_current_active_user, hash_password, verify_password
+from app.utils.security import hash_password, verify_password
+from app.utils.dependencies import get_current_active_user
 
 router = APIRouter()
 
