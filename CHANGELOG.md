@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Campus Filter on Reports** (2025-11-15)
+  - Added campus filter dropdown to Reports page
+  - Filter by department, campus, or both simultaneously
+  - Unique instructor counting (prevents double-counting multi-campus instructors)
+  - Visual active filter badges with remove buttons
+  - "Clear all" button to reset filters
+  - Counts show unique instructors for accurate reporting
+  - Location: `frontend/src/components/admin/Reports.jsx`
+
 ### Fixed
 - **Reports Loading Issue** (2025-11-15)
   - Fixed "Failed to load report data" error in Reports page
@@ -19,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added chair relationship loading to semester requests query
   - Department chairs now properly display in semester tracking view
   - Location: `backend/app/routers/admin/semesters.py:47,65`
+  - Note: Requires hard browser refresh after deployment
 
 - **Bulk Import Not Showing in Reports** (2025-11-15)
   - Fixed bulk imported adjuncts not appearing in reports
