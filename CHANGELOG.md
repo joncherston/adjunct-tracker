@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Manage Semester Feature** (2025-11-15)
+  - New admin interface for managing semester adjunct assignments
+  - View all adjunct assignments grouped by department
+  - Edit assignments to change campuses and courses
+  - Add new adjunct assignments to existing semesters
+  - Remove adjuncts from semester assignments
+  - Multiple campus assignment via checkbox interface
+  - Course management with tag-based UI
+  - Allows admins to fix errors made by department chairs
+  - Backend: `backend/app/routers/admin/semester_assignments.py`
+  - Frontend: `frontend/src/components/admin/ManageSemester.jsx`
+  - Route: `/semesters/manage`
+
 - **Campus Filter on Reports** (2025-11-15)
   - Added campus filter dropdown to Reports page
   - Filter by department, campus, or both simultaneously
