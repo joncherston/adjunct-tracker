@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { Users, Plus, Edit2, Trash2, Search, X, Mail } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { chairsAPI } from '../../services/api';
+import AppHeader from '../common/AppHeader';
 
 const DepartmentChairManagement = () => {
   const [chairs, setChairs] = useState([]);
@@ -107,28 +108,20 @@ const DepartmentChairManagement = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-suscc-blue p-3 rounded-lg">
-                <Users className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-suscc-blue">Department Chair Management</h1>
-                <p className="text-sm text-gray-600">Manage faculty department chairs</p>
-              </div>
-            </div>
-            <button
-              onClick={handleCreate}
-              className="btn-primary flex items-center space-x-2"
-            >
-              <Plus className="h-5 w-5" />
-              <span>Add Department Chair</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <AppHeader
+        icon={Users}
+        title="Department Chair Management"
+        subtitle="Manage faculty department chairs"
+        actions={
+          <button
+            onClick={handleCreate}
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Add Department Chair</span>
+          </button>
+        }
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

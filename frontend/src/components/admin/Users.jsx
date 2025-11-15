@@ -3,17 +3,16 @@
  * Full CRUD interface for managing admin users
  */
 import { useState, useEffect } from 'react';
-import { Users as UsersIcon, Plus, Edit2, Trash2, Key, UserCheck, UserX, Search, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Users as UsersIcon, Plus, Edit2, Trash2, Key, UserCheck, UserX, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import UserModal from './UserModal';
 import PasswordResetModal from './PasswordResetModal';
 import ConfirmDialog from './ConfirmDialog';
+import AppHeader from '../common/AppHeader';
 
 const Users = () => {
   const { user: currentUser } = useAuth();
-  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -126,35 +125,20 @@ const Users = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Back to Dashboard"
-              >
-                <ArrowLeft className="h-6 w-6 text-gray-600" />
-              </button>
-              <div className="bg-suscc-blue p-3 rounded-lg">
-                <UsersIcon className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-suscc-blue">User Management</h1>
-                <p className="text-sm text-gray-600">Manage admin user accounts</p>
-              </div>
-            </div>
-            <button
-              onClick={handleAddUser}
-              className="btn-primary flex items-center space-x-2"
-            >
-              <Plus className="h-5 w-5" />
-              <span>Add User</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <AppHeader
+        icon={UsersIcon}
+        title="User Management"
+        subtitle="Manage admin user accounts"
+        actions={
+          <button
+            onClick={handleAddUser}
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Add User</span>
+          </button>
+        }
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
