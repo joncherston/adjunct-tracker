@@ -10,7 +10,7 @@ class AdjunctInfo(BaseModel):
     """Adjunct instructor info"""
     id: int
     full_name: str
-    email: str
+    email: Optional[str] = None  # Made optional
 
     model_config = {
         "from_attributes": True
@@ -39,11 +39,53 @@ class SemesterInfo(BaseModel):
     }
 
 
+class CampusInfo(BaseModel):
+    """Campus info"""
+    id: int
+    name: str
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class CourseInfo(BaseModel):
+    """Course info"""
+    id: int
+    course_name: str
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class CampusAssignmentInfo(BaseModel):
+    """Campus assignment info"""
+    id: int
+    campus: CampusInfo
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class CourseAssignmentInfo(BaseModel):
+    """Course assignment info"""
+    id: int
+    course: CourseInfo
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
 class AssignmentInfo(BaseModel):
     """Assignment info for reports"""
     id: int
     adjunct: AdjunctInfo
     department: DepartmentInfo
+    campus_assignments: List[CampusAssignmentInfo] = []
+    course_assignments: List[CourseAssignmentInfo] = []
 
     model_config = {
         "from_attributes": True

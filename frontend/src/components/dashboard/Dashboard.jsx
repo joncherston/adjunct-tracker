@@ -14,6 +14,7 @@ const Dashboard = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [departmentCount, setDepartmentCount] = useState(0);
   const [campusCount, setCampusCount] = useState(0);
+  const [activeRequestCount, setActiveRequestCount] = useState(0);
 
   const handleLogout = async () => {
     await logout();
@@ -53,8 +54,27 @@ const Dashboard = () => {
       }
     };
 
+    const loadActiveSemesters = async () => {
+      try {
+        const response = await fetch('/api/admin/semesters', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          // Count active semesters
+          const activeCount = data.filter(s => s.is_active).length;
+          setActiveRequestCount(activeCount);
+        }
+      } catch (error) {
+        console.error('Error loading semesters:', error);
+      }
+    };
+
     loadDepartments();
     loadCampuses();
+    loadActiveSemesters();
   }, []);
 
   return (
@@ -133,10 +153,10 @@ const Dashboard = () => {
               Active Requests
             </h3>
             <p className="text-3xl font-bold text-suscc-blue mb-2">
-              0
+              {activeRequestCount}
             </p>
             <p className="text-sm text-gray-600">
-              No active semester requests
+              {activeRequestCount === 0 ? 'No active semester requests' : `${activeRequestCount} active semester${activeRequestCount === 1 ? '' : 's'}`}
             </p>
           </div>
 
