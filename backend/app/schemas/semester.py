@@ -43,11 +43,23 @@ class SemesterUpdate(BaseModel):
     is_active: Optional[bool] = None
 
 
+class ChairInfo(BaseModel):
+    """Nested schema for department chair info"""
+    id: int
+    full_name: str
+    email: str
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
 class DepartmentInfo(BaseModel):
     """Nested schema for department info"""
     id: int
     name: str
     chair_id: Optional[int]
+    chair: Optional[ChairInfo] = None
 
     model_config = {
         "from_attributes": True
