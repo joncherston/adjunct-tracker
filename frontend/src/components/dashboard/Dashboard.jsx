@@ -31,9 +31,11 @@ const Dashboard = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <div className="bg-white rounded-full w-10 h-10 flex items-center justify-center">
-                  <span className="text-suscc-blue font-bold text-xl">SU</span>
-                </div>
+                <img
+                  src="/logo.png"
+                  alt="Southern Union State Community College"
+                  className="h-10 w-auto"
+                />
                 <span className="ml-3 text-white font-bold text-lg sm:text-xl hidden xs:inline">
                   Adjunct Tracker
                 </span>
