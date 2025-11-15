@@ -55,6 +55,12 @@ async def get_semester_assignments(
     # Get all assignments with related data
     assignments = db.query(SemesterAdjunctAssignment).join(
         SemesterRequest
+    ).join(
+        Department,
+        SemesterAdjunctAssignment.department_id == Department.id
+    ).join(
+        AdjunctInstructor,
+        SemesterAdjunctAssignment.adjunct_instructor_id == AdjunctInstructor.id
     ).options(
         joinedload(SemesterAdjunctAssignment.adjunct),
         joinedload(SemesterAdjunctAssignment.department),
@@ -64,7 +70,7 @@ async def get_semester_assignments(
     ).filter(
         SemesterRequest.semester_id == semester_id
     ).order_by(
-        SemesterAdjunctAssignment.department_id,
+        Department.name,
         AdjunctInstructor.full_name
     ).all()
 
