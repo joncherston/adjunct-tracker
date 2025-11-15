@@ -3,7 +3,8 @@
  * Full CRUD interface for managing admin users
  */
 import { useState, useEffect } from 'react';
-import { Users as UsersIcon, Plus, Edit2, Trash2, Key, UserCheck, UserX, Search } from 'lucide-react';
+import { Users as UsersIcon, Plus, Edit2, Trash2, Key, UserCheck, UserX, Search, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import UserModal from './UserModal';
@@ -12,6 +13,7 @@ import ConfirmDialog from './ConfirmDialog';
 
 const Users = () => {
   const { user: currentUser } = useAuth();
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -128,6 +130,13 @@ const Users = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Back to Dashboard"
+              >
+                <ArrowLeft className="h-6 w-6 text-gray-600" />
+              </button>
               <div className="bg-suscc-blue p-3 rounded-lg">
                 <UsersIcon className="h-6 w-6 text-white" />
               </div>
